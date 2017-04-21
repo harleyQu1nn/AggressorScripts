@@ -9,4 +9,5 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
 **Dependencies:**
 
     Parent Folder/Files: /opt/cobaltstrike/, /opt/cobaltstrike/av_hips_executables.txt
-    Sub Folders: /opt/cobaltstrike/scripts/, /opt/cobaltstrike/Payloads
+    Sub Folders: /opt/cobaltstrike/scripts/, /opt/cobaltstrike/Payloads/, /opt/cobaltstrike/modules/
+    Elevate Kit (Licensed Users Only)
