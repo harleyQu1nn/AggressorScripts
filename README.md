@@ -8,6 +8,22 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
 
 **Dependencies:**
 
-    Parent Folder/Files: /opt/cobaltstrike/, /opt/cobaltstrike/av_hips_executables.txt
-    Sub Folders: /opt/cobaltstrike/scripts/, /opt/cobaltstrike/Payloads/, /opt/cobaltstrike/modules/
+    Parent Folder/Files: 
+        /opt/cobaltstrike/All_In_One.cna
+        /opt/cobaltstrike/av_hips_executables.txt 
+        /opt/cobaltstrike/logs.py
+    Sub Folders: 
+        /opt/cobaltstrike/scripts/
+        /opt/cobaltstrike/Payloads/
+        /opt/cobaltstrike/modules/
     Elevate Kit (Licensed Users Only)
+
+* logs.py
+
+    * Author: Matthew Merrill @noone
+    
+    * Python Script to parse all cobalt input/output logs and export into a HTML document
+    
+    * *Still in Beta Stage
+    
+    * Syntax: ./logs.py [Teamserver NickName]
