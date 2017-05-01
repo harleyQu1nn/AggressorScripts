@@ -22,6 +22,9 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     
     * Logging script that captures all the Beacon outputs. Formats the Beacon input line to display timestamps. Use with logs.py to export all the logs for each operator.
     * All logs will be created inside the /opt/cobaltstrike/logs/ directory
+    
+    ![logs](https://cloud.githubusercontent.com/assets/27856212/25580186/b85454fe-2e4c-11e7-91e1-10ab88d4e3fe.png)
+    ![logs1](https://cloud.githubusercontent.com/assets/27856212/25580187/ba60dbbe-2e4c-11e7-8a37-7cfb124d99e9.png)
 
 **Logger.cna Dependencies:**
 
