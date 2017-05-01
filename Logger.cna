@@ -2,7 +2,7 @@
 # Need av_hips_executables.txt file in the same folder as this script.
 # To consolidate all logs please load this script, av_hips_executables.txt, and logs.py in /opt/cobaltstrike/ directory
 # Author: @Qu1nn
-
+##
 
 #Logging Menubar
 menubar("Export OP Logs", "exportlogs", 2);
