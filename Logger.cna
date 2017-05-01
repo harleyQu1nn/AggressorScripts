@@ -1,0 +1,194 @@
+## Logging only script with color coded process list
+# Need av_hips_executables.txt file in the same folder as this script.
+# To consolidate all logs please load this script, av_hips_executables.txt, and logs.py
+# Author: @Qu1nn
+
+
+#Logging Menubar
+menubar("Export OP Logs", "exportlogs", 2);
+popup exportlogs {
+	item "&Export OP Logs to HTML" {
+		prompt_confirm("Do you want to consolidate all OP Logs? (Recommended for Post Operation)", "Log Consolidation", {
+			show_message("Consolidating all OP Logs...");
+			exec("/opt/cobaltstrike/logs.py " . mynick());
+		});
+	}
+}
+
+global(@avlist);
+
+## Set logging input/outputs
+set BEACON_INPUT {
+    $bd = bdata($1);
+    if ($2 eq mynick()) {
+        return "\U" . mynick() . "\U" . "\U[" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . formatDate($4, 'yyyyMMMdd HH:mm:ss') . "\o> $3";
+    } else {
+        return "\U" . mynick() . "\U" . "$2 \U[" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . formatDate($4, 'yyyyMMMdd HH:mm:ss') ."\o> $3";
+    }
+}
+
+on beacon_input {
+	$bd = bdata($1);
+	local('$in');
+
+	if($2 eq mynick()) {
+		$in = openf(">>/opt/cobaltstrike/logs/operator_logs/operator_input/" . formatDate($4, 'yyyyMMMdd') . "_" . mynick() . ".log");
+
+		writeb($in, mynick() . "[" . $bd['internal'] . "_" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . formatDate($4, 'yyyyMMMdd HH:mm:ss') . "> $3" . "\n");
+
+		closef($in);
+	}
+}
+
+on beacon_output {
+	$bd = bdata($1);
+	local('$out');
+
+	$out = openf(">>/opt/cobaltstrike/logs/operator_logs/beacon_output/" . formatDate($3, 'yyyyMMMdd') . "_" . $bd['internal'] . "_" . $bd['computer'] . "_output.log");
+
+	println($out, mynick() . "[" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . formatDate($3, 'yyyyMMMdd HH:mm:ss') . "\n");
+	println($out, "$2" . "\n");
+
+	closef($out);
+}
+
+on beacon_output_alt {
+
+	$bd = bdata($1);
+	local('$out');
+
+	$out = openf(">>/opt/cobaltstrike/logs/operator_logs/beacon_output/" . formatDate($3, 'yyyyMMMdd') . "_" . $bd['internal'] . "_" . $bd['computer'] . "_output.log");
+
+	println($out, mynick() . "[" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . formatDate($3, 'yyyyMMMdd HH:mm:ss') . "\n");
+	println($out, "$2" . "\n");
+
+	closef($out);
+
+}
+
+on beacon_tasked {
+
+	$bd = bdata($1);
+	local('$out');
+
+	$out = openf(">>/opt/cobaltstrike/logs/operator_logs/beacon_output/" . formatDate($3, 'yyyyMMMdd') . "_" . $bd['internal'] . "_" . $bd['computer'] . "_output.log");
+
+	println($out, mynick() . "[" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . formatDate($3, 'yyyyMMMdd HH:mm:ss') . "\n");
+	println($out, "$2" . "\n");
+
+	closef($out);
+
+}
+
+set BEACON_OUTPUT_PS {
+
+	$bd = bdata($1);
+	local('$out');
+
+	$out = openf(">>/opt/cobaltstrike/logs/operator_logs/beacon_output/" . formatDate($3, 'yyyyMMMdd') . "_" . $bd['internal'] . "_" . $bd['computer'] . "_output.log");
+
+	println($out, mynick() . "[" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . formatDate($3, 'yyyyMMMdd HH:mm:ss') . "\n");
+	println($out, "$2" . "\n");
+
+	closef($out);
+
+	$handle = openf(script_resource("av_hips_executables.txt"));
+
+	while $line (readln($handle)) {
+		push(@avlist,$line);
+	}
+
+	local('$outps $temp $name $ppid $pid $arch $user $session @ps');
+	$outps .= "\cC[*]\o Process List with process highlighting of AV/HIPS, Browsers, Explorer/Winlogon, current processes\n";
+	$outps .= "\cC[*]\o Current Running PID: \c8 Yellow \o \n";
+	$outps .= "\cC[*]\o AV/HIPS: \c4 RED \o \n";
+	$outps .= "\cC[*]\o Browsers: \c3 GREEN \o \n";
+	$outps .= "\cC[*]\o Explorer/Winlogon: \c2 BLUE \o \n\n";
+	$outps .= " PID   PPID  Name                         Arch  Session     User\n";
+	$outps .= "\cE ---   ----  ----                         ----  -------     -----\n";
+
+	foreach $temp (split("\n", ["$2" trim])) {
+		($name, $ppid, $pid, $arch, $user, $session) = split("\t", $temp);
+
+
+		# highlight AV processes in RED.
+		if(iff($name in @avlist,true,false)) {
+		push(@ps, %(pid => $pid, entry => "\c4 $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user \o"));
+
+		# highlight explorer , winlogon in BLUE 
+		} else if ($name eq "explorer.exe" || $name eq "winlogon.exe") {
+		push(@ps, %(pid => $pid, entry => "\c2 $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user \o"));
+
+		# highlight browsers processes in GREEN
+		} else if ($name eq "chrome.exe" || $name eq "firefox.exe" || $name eq "iexplore.exe") {
+		push(@ps, %(pid => $pid, entry => "\c3 $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user \o"));
+
+		# highlight current process in YELLOW
+		} else if ($pid eq $bd['pid']) {
+		push(@ps, %(pid => $pid, entry => "\c8 $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user \o"));
+
+		} else {
+		push(@ps, %(pid => $pid, entry => " $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user"));
+
+		}
+
+	}
+
+	# sort the processes please
+	sort({ return $1['pid'] <=> $2['pid']; }, @ps);
+
+	# append to our outstring
+	foreach $temp (@ps) {
+
+		$outps .= "$temp['entry'] \n";
+
+		}
+
+	return $outps;
+}
+
+set BEACON_OUTPUT_LS {
+
+	$bd = bdata($1);
+	local('$out');
+
+	$out = openf(">>/opt/cobaltstrike/logs/operator_logs/beacon_output/" . formatDate($3, 'yyyyMMMdd') . "_" . $bd['internal'] . "_" . $bd['computer'] . "_output.log");
+
+	println($out, mynick() . "[" . $bd['computer'] . "]" . $bd['user'] . "/" . $bd['pid'] . "|" . formatDate($3, 'yyyyMMMdd HH:mm:ss') . "\n");
+	println($out, $outls . "$2" . "\n");
+
+	closef($out);
+
+	local('$outls @results $cwd $entry $type $size $modified $name');
+	@results = split("\n", ["$2" trim]);
+
+	$cwd = left(shift(@results), -1);	# first entry is the current folder
+
+	# parse/process results
+	foreach $entry (@results) {
+		($type, $size, $modified, $name) = split("\t", $entry);
+		if ($type eq "F") {
+			$entry = %(type => "fil", size => format_size($size), modified => $modified, name => $name);
+		}
+		else if ($type eq "D" && $name ne "." && $name ne "..") {
+			$entry = %(type => "dir", size => "", modified => $modified, name => $name);
+		}
+		else {
+			remove();
+		}
+	}
+
+	# sort in alpha order with dir listings on top.
+	sort({ return ($1['type'] . lc($1['name'])) cmp ($2['type'] . lc($2['name'])); }, @results);
+
+	$outls .= "\cC[*]\o Listing: $cwd $+ \n\n";
+	$outls .= " Size     Type    Last Modified         Name\n";   
+	$outls .= "\cE ----     ----    -------------         ----\n";
+
+	foreach $entry (@results) {
+		($type, $size, $modified, $name) = values($entry, @('type', 'size', 'modified', 'name'));
+		$outls .= " $[8]size $[7]type $[21]modified $name $+ \n";
+	}
+
+	return $outls;
+}
