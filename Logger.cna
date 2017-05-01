@@ -4,6 +4,11 @@
 # Author: @Qu1nn
 ##
 
+#Custom Directories for logging
+mkdir("/opt/cobaltstrike/logs/operator_logs");
+mkdir("/opt/cobaltstrike/logs/operator_logs/beacon_output");
+mkdir("/opt/cobaltstrike/logs/operator_logs/operator_input");
+
 #Logging Menubar
 menubar("Export OP Logs", "exportlogs", 2);
 popup exportlogs {
