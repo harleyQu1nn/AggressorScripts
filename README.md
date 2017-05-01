@@ -6,7 +6,7 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
    * Thanks to @rsmudge, @enigma0x3, @harmj0y, PowerShell Mafia folks, Nathan Wray, @Und3rFl0w, @oldb00t, bluescreenofjeff for all the help and code snippets.
    * Script must reside in /opt/cobaltstrike/ directory. (Location can be changed inside the script)
 
-**Dependencies:**
+**All_In_One.cna Dependencies:**
 
     Parent Folder/Files: 
         /opt/cobaltstrike/All_In_One.cna
@@ -17,6 +17,18 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
         /opt/cobaltstrike/Payloads/
         /opt/cobaltstrike/modules/
     Elevate Kit (Licensed Users Only)
+
+* Logger.cna
+    
+    * Logging script that captures all the Beacon outputs. Formats the Beacon input line to display timestamps. Use with logs.py to export all the logs for each operator.
+    * All logs will be created inside the /opt/cobaltstrike/logs/ directory
+
+**Logger.cna Dependencies:**
+
+    Parent Folder:
+    /opt/cobaltstrike/Logger.cna
+    /opt/cobaltstrike/av_hips_executables.txt
+    /opt/cobaltstrike/logs.py
 
 * logs.py
 
