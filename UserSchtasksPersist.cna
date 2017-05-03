@@ -6,7 +6,6 @@
 
 sub persistUserSchtasks  {
 	$bid = $1;
-
 	$dialog = dialog("User Schtasks Persistence", %(taskname => "Evil Task Name..", targetpath => "Target Path..", payloadfile => "Select.."), lambda({
 		if ("$3['taskname']" ismatch 'Evil Task Name..' || "$3['targetpath']" ismatch 'Target Path..' || "$3['payloadfile']" ismatch 'Select..') {
 			berror($bid, "\c4Please enter a valid Task Name, Target Path, and a valid Payload File.");
