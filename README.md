@@ -40,6 +40,12 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     * Meant for quick user level persistence upon initial access
     
     * Thanks to @noone and bluescreenofjeff for assistance
+    
+* ServiceEXEPersist.cna
+
+    * Admin Level Custom Service EXE Persistence
+    
+    * Runs as elevated user/SYSTEM for the selected beacon
 
 * logs.py
 
