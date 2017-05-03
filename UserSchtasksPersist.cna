@@ -25,7 +25,7 @@ sub persistUserSchtasks  {
 	drow_text($dialog, "targetpath", "Target Path:");
 	drow_file($dialog, "payloadfile", "DLL Payload:");
 	
-	dbutton_action($dialog, "Ok");
+	dbutton_action($dialog, "Create");
 	dialog_show($dialog);
 
 }
