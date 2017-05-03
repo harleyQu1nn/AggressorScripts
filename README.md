@@ -32,6 +32,14 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     /opt/cobaltstrike/Logger.cna
     /opt/cobaltstrike/av_hips_executables.txt
     /opt/cobaltstrike/logs.py
+    
+* UserSchtasksPersist.cna
+
+    * User Schtasks Persistence that runs as current user for the selected beacon
+    
+    * Meant for quick user level persistence upon initial access
+    
+    * Thanks to @noone and bluescreenofjeff for assistance
 
 * logs.py
 
