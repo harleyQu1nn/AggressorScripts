@@ -54,6 +54,10 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     * Very syntax heavy, Test first before using on live targets
     
     ![wmic4](https://cloud.githubusercontent.com/assets/27856212/25680015/5eeab692-301d-11e7-8b85-914fe928e426.PNG)
+    
+* RegistryPersist.cna
+
+    * Creates a Custom Registry Key, Value, Type, and Payload Location based on user input for selected beacon
 
 * logs.py
 
