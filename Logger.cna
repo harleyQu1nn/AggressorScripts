@@ -1,7 +1,7 @@
 ## Logging only script with color coded process list
 # Need av_hips_executables.txt file in the same folder as this script.
 # To consolidate all logs please load this script, av_hips_executables.txt, and logs.py in /opt/cobaltstrike/ directory
-# Author: @Qu1nn
+# Author: @r3dQu1nn
 ##
 
 #Custom Directories for logging
