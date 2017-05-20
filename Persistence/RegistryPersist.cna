@@ -1,5 +1,5 @@
 #Registry Persistence
-#Author: @Qu1nn
+#Author: @r3dQu1nn
 #Depending on Registry Location elevated access might be required
 
 sub persistRegistry {
