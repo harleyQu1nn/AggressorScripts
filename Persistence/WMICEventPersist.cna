@@ -1,5 +1,5 @@
 #Permanent WMI Event using WMIC Persistence
-#Author: @Qu1nn
+#Author: @r3dQu1nn
 #Generates a Custom WMI Event using WMIC for SYSTEM Level persistence on selected beacon
 #Very syntax heavy, Test first before using on live targets
 
