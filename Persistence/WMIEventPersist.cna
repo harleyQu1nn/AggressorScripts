@@ -1,4 +1,4 @@
-#Permanent WMI Event using WMIC Persistence
+#Permanent WMI Event using PowerShell Persistence
 #Author: @r3dQu1nn
 #Generates a Custom WMI Event using Powershell for SYSTEM Level persistence on selected beacon
 #Very syntax heavy, Test first before using on live targets
