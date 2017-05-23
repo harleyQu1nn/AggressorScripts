@@ -4,7 +4,7 @@
 
 popup beacon_top {
 	menu "&Red Team"{
-#Persistence Menu		
+		#Persistence Menu		
 		menu "&Persistence" {
 			item "&Schtasks Persistence" {
 				local('$bid');
