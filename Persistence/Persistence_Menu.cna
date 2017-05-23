@@ -69,7 +69,7 @@ popup beacon_top {
 
 
 #User Schtasks Persistence
-#Author: @Qu1nn
+#Author: @r3dQu1nn
 #Runs as current user for the selected beacon
 #Meant for quick user level persistence upon initial access
 #Thanks to @noone and bluescreenofjeff for help
@@ -103,7 +103,7 @@ sub persistUserSchtasks  {
 }
 
 #Admin Level Custom Service EXE Persistence
-#Author: @Qu1nn
+#Author: @r3dQu1nn
 #Runs as elevated user/SYSTEM for the selected beacon
 
 sub persistCustomService {
@@ -137,7 +137,7 @@ sub persistCustomService {
 }
 
 #Registry Persistence
-#Author: @Qu1nn
+#Author: @r3dQu1nn
 #Depending on Registry Location elevated access might be required
 
 sub persistRegistry {
@@ -166,7 +166,7 @@ sub persistRegistry {
 }
 
 #Permanent WMI Event using WMIC Persistence
-#Author: @Qu1nn
+#Author: @r3dQu1nn
 #Generates a Custom WMI Event using WMIC for SYSTEM Level persistence on selected beacon
 #Very syntax heavy, Test first before using on live targets
 
@@ -201,6 +201,11 @@ sub persistwmieventwmic {
 	dialog_show($dialog);
 
 }
+
+#Permanent WMI Event using PowerShell Persistence
+#Author: @r3dQu1nn
+#Generates a Custom WMI Event using PowerShell for SYSTEM Level persistence on selected beacon
+#Very syntax heavy, Test first before using on live targets
 
 sub persistwmievent  {
 	$bid = $1;
