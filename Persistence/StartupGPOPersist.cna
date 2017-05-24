@@ -10,7 +10,7 @@ sub persistStartupGPO  {
 	$bid = $1;
 	$dialog = dialog("Startup Script Local GPO Persistence", %(scriptfile => "Select PS1 Script File.."), lambda({
 		if ("$3['scriptfile']" ismatch 'Select PS1 Script File..') {
-			berror($bid, "\c4Please enter a valid Script Path, and .ps1 Script File.");
+			berror($bid, "\c4Please enter a valid .ps1 Script File.");
 			break;
 		}
 		else {
