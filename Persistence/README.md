@@ -55,3 +55,5 @@
 * RegistryPersist.cna
 
     * Creates a Custom Registry Key, Value, Type, and Payload Location based on user input for selected beacon
+    
+    ![registry](https://cloud.githubusercontent.com/assets/27856212/26449228/14f41a48-411f-11e7-8690-3ce3c1541738.PNG)
