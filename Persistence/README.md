@@ -2,7 +2,9 @@
 
 **Persistence Aggressor Scripts for Cobalt Strike 3.0+**
 
-* Persistence_Menu.cna includes all scripts into one beacon menu
+* Persistence_Menu.cna
+   
+   * Includes all scripts into one beacon menu
 
 * UserSchtasksPersist.cna
 
@@ -12,11 +14,15 @@
     
     * Thanks to @noone and bluescreenofjeff for assistance
     
+    ![schtasks](https://cloud.githubusercontent.com/assets/27856212/26449039/2b43a742-411e-11e7-8ac4-f003c8060654.PNG)
+    
 * ServiceEXEPersist.cna
 
     * Admin Level Custom Service EXE Persistence
     
     * Runs as elevated user/SYSTEM for the selected beacon
+    
+    ![service](https://cloud.githubusercontent.com/assets/27856212/26449045/2e4a13c2-411e-11e7-83e4-2b57babdbbdd.PNG)
     
 * WMICEventPersist.cna
     
@@ -31,6 +37,8 @@
     * Generates a Custom WMI Event using PowerShell for SYSTEM Level persistence on selected beacon
 
     * Very syntax heavy, Test first before using on live targets
+    
+    ![wmipersist1](https://cloud.githubusercontent.com/assets/27856212/26449054/36d33172-411e-11e7-818d-7f0702a40712.PNG)
 
 * StartupGPOPersist.cna
    
@@ -41,6 +49,8 @@
    * Check permissions with GPO Enumeration (Successful GroupPolicy Directory Listing) first before executing
    
    * Beacon execution will cause winlogon.exe to hang and the end user can't login. Once the new beacon checks in inject into        another process and kill the original. Update to come out soon.
+   
+   ![gpo](https://cloud.githubusercontent.com/assets/27856212/26449031/1ffb0aba-411e-11e7-9138-f23de966ac4b.PNG)
     
 * RegistryPersist.cna
 
