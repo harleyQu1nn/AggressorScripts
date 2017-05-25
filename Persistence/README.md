@@ -31,6 +31,16 @@
     * Generates a Custom WMI Event using PowerShell for SYSTEM Level persistence on selected beacon
 
     * Very syntax heavy, Test first before using on live targets
+
+* StartupGPOPersist.cna
+   
+   * Generates a Local GPO Entry in psscripts.ini to call a .ps1 script file for persistence on selected beacon
+   
+   * Calls back as SYSTEM
+   
+   * Check permissions with GPO Enumeration (Successful GroupPolicy Directory Listing) first before executing
+   
+   * Beacon execution will cause winlogon.exe to hang and the end user can't login. Once the new beacon checks in inject into        another process and kill the original. Update to come out soon.
     
 * RegistryPersist.cna
 
