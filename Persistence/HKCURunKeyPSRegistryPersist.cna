@@ -1,6 +1,8 @@
 #HKCU Run Key Registry PowerShell Persistence
 #Author: @r3dQu1nn
 #Generates a powershell Base64 Encoded payload as a HKCU Run Key Registry Entry for persistence on selected beacon based off a HTTP/HTTPS Listener
+#Big thanks to @christruncer and @merrillmatt for the help and code snippets
+#Fileless Registry Persistence using PowerShell
 
 sub payloadgenerate {
 	foreach $name (listeners()) {
