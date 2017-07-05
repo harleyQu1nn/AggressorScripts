@@ -4,7 +4,7 @@
 
 sub payloadgenerate {
 	foreach $name (listeners()) {
-		$original_listener = $name;
+	$original_listener = $name;
         $listener_name = lc($name);
         if ($listener_name hasmatch "http" || $listener_name hasmatch "https") {
         	$data = artifact($original_listener, "powershell");
