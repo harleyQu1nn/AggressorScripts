@@ -35,7 +35,7 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
 
 * logs.py
 
-    * Author: Matthew Merrill @noone
+    * Author: Matthew Merrill @merrillmatt011
     
     * Python Script to parse all cobalt input/output logs and export into a HTML document
     
