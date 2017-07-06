@@ -18,7 +18,7 @@ popup payloadgenerator {
 
 sub payloadgenerate {
 	foreach $name (listeners_local()) {
-		$original_listener = $name;
+	$original_listener = $name;
         $listener_name = lc($name);
         if ($listener_name hasmatch "http" || $listener_name hasmatch "https") {
         	
@@ -33,29 +33,29 @@ sub payloadgenerate {
 
         	#Write and Save Payloads
         	$handle = openf(">/opt/cobaltstrike/Staged_Payloads/dllpayload.dll");
-			writeb($handle, $data);
-			closef($handle);
-			$handle1 = openf(">/opt/cobaltstrike/Staged_Payloads/dllx64payload.dll");
-			writeb($handle1, $data1);
-			closef($handle1);
-			$handle2 = openf(">/opt/cobaltstrike/Staged_Payloads/exepayload.exe");
-			writeb($handle2, $data2);
-			closef($handle2);
-			$handle3 = openf(">/opt/cobaltstrike/Staged_Payloads/powershellpayload.ps1");
-			writeb($handle3, $data3);
-			closef($handle3);
-			$handle4 = openf(">/opt/cobaltstrike/Staged_Payloads/pythonpayload.py");
-			writeb($handle4, $data4);
-			closef($handle4);
-			$handle5 = openf(">/opt/cobaltstrike/Staged_Payloads/svcexepayload.exe");
-			writeb($handle5, $data5);
-			closef($handle5);
-			$handle6 = openf(">/opt/cobaltstrike/Staged_Payloads/vbspayload.vbs");
-			writeb($handle6, $data6);
-			closef($handle6);
+		writeb($handle, $data);
+		closef($handle);
+		$handle1 = openf(">/opt/cobaltstrike/Staged_Payloads/dllx64payload.dll");
+		writeb($handle1, $data1);
+		closef($handle1);
+		$handle2 = openf(">/opt/cobaltstrike/Staged_Payloads/exepayload.exe");
+		writeb($handle2, $data2);
+		closef($handle2);
+		$handle3 = openf(">/opt/cobaltstrike/Staged_Payloads/powershellpayload.ps1");
+		writeb($handle3, $data3);
+		closef($handle3);
+		$handle4 = openf(">/opt/cobaltstrike/Staged_Payloads/pythonpayload.py");
+		writeb($handle4, $data4);
+		closef($handle4);
+		$handle5 = openf(">/opt/cobaltstrike/Staged_Payloads/svcexepayload.exe");
+		writeb($handle5, $data5);
+		closef($handle5);
+		$handle6 = openf(">/opt/cobaltstrike/Staged_Payloads/vbspayload.vbs");
+		writeb($handle6, $data6);
+		closef($handle6);
 
-			#Stageless Payloads
-			artifact_stageless($original_listener, "dll", "x86", "", &dll);
+		#Stageless Payloads
+		artifact_stageless($original_listener, "dll", "x86", "", &dll);
         	artifact_stageless($original_listener, "dllx64", "x86", "", &dllx64);
         	artifact_stageless($original_listener, "exe", "x86", "", &exe);
         	artifact_stageless($original_listener, "powershell", "x86", "", &ps1);
