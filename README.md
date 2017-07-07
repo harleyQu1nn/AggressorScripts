@@ -42,3 +42,9 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     * *Still in Beta Stage
     
     * Syntax: ./logs.py [Teamserver NickName]
+    
+* ArtifactPayloadGenerator.cna
+
+    * Generates every type of Stageless/Staged Payload based off a HTTP/HTTPS Listener
+    
+    * Creates /opt/cobaltstrike/Staged_Payloads, /opt/cobaltstrike/Stageless_Payloads
