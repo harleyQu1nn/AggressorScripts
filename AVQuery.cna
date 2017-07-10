@@ -3,13 +3,15 @@
 #Queries the Registry for AV installed
 #Thanks to @i_am_excite and @merrillmatt011 for the help
 
+#Long ass one-liner :)
 $powershellcmd = "\$av_list = @(\"BitDefender\", \"Kaspersky\", \"McAfee\", \"Norton\", \"Avast\", \"WebRoot\", \"AVG\", \"ESET\", \"Malware\", \"Windows Defender\");\$av_install = Get-ItemProperty HKLM:\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*;\$av_install1 = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*;\$regkey = 'HKLM:\\SOFTWARE\\Microsoft\\Windows Defender\\Signature Updates\\';\$av_loop2 = foreach (\$av1 in \$av_list){foreach (\$key in \$av_install){if (\$key.DisplayName -match \$av1 -eq \$TRUE){% {\"{0}|{1}|{2}\" -f \$key.DisplayName.ToString(), \$key.DisplayVersion.ToString(), \$key.InstallDate.ToString()}}}};\$proc_temp = Get-Process;\$av_loop = foreach (\$av in \$av_list){foreach (\$zz in \$proc_temp){if (\$zz.path -match \$av -eq \$TRUE){% {\"{0}|{1}|{2}\" -f \$zz.Id.ToString(), \$zz.Name.Split('\"')[0],  \$zz.Path.ToString()}}}};\$av_loop3 = foreach (\$av2 in \$av_list){foreach (\$key1 in \$av_install1){if (\$key1.DisplayName -match \$av2 -eq \$TRUE){% {\"{0}|{1}|{2}\" -f \$key1.DisplayName.ToString(), \$key1.DisplayVersion.ToString(), \$key1.InstallDate.ToString()}}}};Write-Output \"`nPID|Name|Path`n\";Write-Output \$av_loop;Write-Output \"`nWindows Defender AV Signature Version:\";(Get-ItemProperty -Path \$regkey).ASSignatureVersion;Write-Output \"`nAV Name|Version|Install Date`n\";Write-Output \$av_loop2;Write-Output \$av_loop3";
 
-#RunKeys Command Register
+#AV_Query Command Register
 beacon_command_register("AV_Query", "Queries the Registry for AV Installed",
 	"Syntax: AV_Query\n" .
 	"Checks HKLM hive for All AntiVirus installed");
 
+#AV_Query alias
 alias AV_Query {
 	
 	blog($1, "\cBDetermining what AntiVirus is installed...");
