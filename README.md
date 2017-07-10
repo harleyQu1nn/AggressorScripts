@@ -48,3 +48,11 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     * Generates every type of Stageless/Staged Payload based off a HTTP/HTTPS Listener
     
     * Creates /opt/cobaltstrike/Staged_Payloads, /opt/cobaltstrike/Stageless_Payloads
+    
+* AVQuery.cna
+
+    * Queries the Registry with powershell for all AV Installed on the target
+    
+    * Quick and easy way to get the AV you are dealing with as an attacker
+    
+    ![avquery](https://user-images.githubusercontent.com/27856212/28033658-ef8578c4-657c-11e7-8906-a23b3c9e82e4.png)
