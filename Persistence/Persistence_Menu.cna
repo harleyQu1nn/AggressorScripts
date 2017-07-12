@@ -360,7 +360,7 @@ sub persistThroughStartUpFolder {
 	$bid = $1;
 	$dialog = dialog("Start Up Folder Persistence", %(startup => "Startup Directory Folder..", payload => "Select Payload.."), lambda({
 		if ("$3['startup']" ismatch 'Startup Directory Folder..' || "$3['payload']" ismatch 'Select Payload..') {
-			berror($bid, "\c4Please enter a valid Startup Directory Folder, and select a Payload")
+			berror($bid, "\c4Please enter a valid Startup Directory Folder, and select a Payload.");
 			break;
 		}
 		else {
@@ -372,7 +372,7 @@ sub persistThroughStartUpFolder {
 	dialog_description($dialog, "Start Up Folder Persistence - Generates a Startup Folder Entry and places a payload inside that folder. **Windows NT 6.0-10.0/All Users Location - %SystemDrive%\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup | Windows NT 6.0-10.0/Current User Location %SystemDrive%\Users\%UserName%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup");
 
 	drow_text($dialog, "startup", "StartUp Directory Folder Location:");
-	drow_text($dialog, "payload", "Select Payload:");
+	drow_file($dialog, "payload", "Select Payload:");
 
 	dbutton_action($dialog, "Create");
 	dialog_show($dialog);
