@@ -54,6 +54,14 @@
     
 * RegistryPersist.cna
 
-    * Creates a Custom Registry Key, Value, Type, and Payload Location based on user input for selected beacon
+   * Creates a Custom Registry Key, Value, Type, and Payload Location based on user input for selected beacon
     
     ![registry](https://cloud.githubusercontent.com/assets/27856212/26449228/14f41a48-411f-11e7-8690-3ce3c1541738.PNG)
+    
+* HKCURunKeyPSRegistryPersist.cna
+
+   * Creates two Custom Registry Run Key entries in HKCU
+   
+   * The Payload is a base64 encoded powershell payload based off your HTTP/HTTPS listener
+   
+   ![hkcu](https://user-images.githubusercontent.com/27856212/28122833-5bee8d72-66ed-11e7-8d0b-332f32627c62.png)
