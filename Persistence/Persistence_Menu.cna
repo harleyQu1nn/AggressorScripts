@@ -174,7 +174,7 @@ sub persistRegistryPowerShell {
 	$bid = $1;
 	$dialog = dialog("HKCU Run Key Registry PowerShell Persistence (User Level)", %(keyname => "Key Name for Payload..", keyname1 => "Key Name to execute Payload.."), lambda({
 		if ("$3['keyname']" ismatch 'Key Name for Payload..' || "$3['keyname1']" ismatch 'Key Name to execute Payload..') {
-			berror($bid, "\c4Please enter a valid Registry Key Names, Payload, and a valid Path location.");
+			berror($bid, "\c4Please enter valid Registry Key Names.");
 			break;
 		}
 		else {
