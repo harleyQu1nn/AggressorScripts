@@ -55,4 +55,4 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     
     * Quick and easy way to get the AV you are dealing with as an attacker
     
-    ![avquery](https://user-images.githubusercontent.com/27856212/28033658-ef8578c4-657c-11e7-8906-a23b3c9e82e4.png)
+    ![av](https://user-images.githubusercontent.com/27856212/28275624-7331ab2e-6ae2-11e7-8405-3393e917863e.png)
