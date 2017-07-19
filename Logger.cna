@@ -15,7 +15,7 @@ popup exportlogs {
 	item "&Export OP Logs to HTML" {
 		prompt_confirm("Do you want to consolidate all OP Logs? (Recommended for Post Operation)", "Log Consolidation", {
 			show_message("Consolidating all OP Logs...");
-			exec("/opt/cobaltstrike/logs.py " . mynick());
+			exec("python logs.py " . mynick());
 		});
 	}
 }
