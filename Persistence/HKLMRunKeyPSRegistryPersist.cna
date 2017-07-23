@@ -4,7 +4,7 @@
 
 sub payloadgenerate {
 	foreach $name (listeners()) {
-		$original_listener = $name;
+	$original_listener = $name;
         $listener_name = lc($name);
         if ($listener_name hasmatch "http" || $listener_name hasmatch "https") {
         	$data = artifact($original_listener, "powershell");
@@ -13,7 +13,7 @@ sub payloadgenerate {
 	}
 }
 
-sub persistRegistryPowerShell {
+sub persistRegistryHKLM {
 	$bid = $1;
 	$dialog = dialog("HKLM Run Key Registry PowerShell Persistence (User Level)", %(keyname => "Key Name for Payload..", keyname1 => "Key Name to execute Payload.."), lambda({
 		if ("$3['keyname']" ismatch 'Key Name for Payload..' || "$3['keyname1']" ismatch 'Key Name to execute Payload..') {
@@ -48,6 +48,6 @@ sub persistRegistryPowerShell {
 
 popup beacon_bottom {
 	item "HKLM Run Key Registry PowerShell Persistence" {
-		persistRegistryPowerShell($1);
+		persistRegistryHKLM($1);
 	}
 }
