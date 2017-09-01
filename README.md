@@ -25,23 +25,6 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     
     ![logs](https://cloud.githubusercontent.com/assets/27856212/25580186/b85454fe-2e4c-11e7-91e1-10ab88d4e3fe.png)
     ![logs1](https://cloud.githubusercontent.com/assets/27856212/25580187/ba60dbbe-2e4c-11e7-8a37-7cfb124d99e9.png)
-
-**Logger.cna Dependencies:**
-
-    Parent Folder:
-    /opt/cobaltstrike/Logger.cna
-    /opt/cobaltstrike/av_hips_executables.txt
-    /opt/cobaltstrike/logs.py
-
-* logs.py
-
-    * Author: Matthew Merrill @merrillmatt011
-    
-    * Python Script to parse all cobalt input/output logs and export into a HTML document
-    
-    * *Still in Beta Stage
-    
-    * Syntax: ./logs.py [Teamserver NickName]
     
 * ArtifactPayloadGenerator.cna
 
