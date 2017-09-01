@@ -1,4 +1,4 @@
-Logging Scripts
+# Logging Scripts
 
 **Logger.cna Dependencies:**
 
