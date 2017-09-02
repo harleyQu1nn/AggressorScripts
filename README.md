@@ -31,3 +31,11 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     * Quick and easy way to get the AV you are dealing with as an attacker
     
     ![av](https://user-images.githubusercontent.com/27856212/28275624-7331ab2e-6ae2-11e7-8405-3393e917863e.png)
+
+* CertUtilWebDelivery.cna
+
+    * Stageless Web Delivery using CertUtil.exe 
+    
+    * Powerpick is used to spawn certutil.exe to download the stageless payload on target and execute with rundll32.exe
+    
+    ![certutil2](https://user-images.githubusercontent.com/27856212/29992549-12d45854-8f6c-11e7-95c7-c2892582f56f.PNG)
