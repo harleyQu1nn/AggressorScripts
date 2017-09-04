@@ -190,7 +190,7 @@ alias RedRepo {
 
 	if ($2 is $null) {
 		berror($1, "\c4Need to specify additional syntax! Use the 'List' command for help");
-		blog($1, "\cBSyntax Example: CommandRepo Windows");
+		blog($1, "\cBSyntax Example: RedRepo Windows");
 	}
 
 }
