@@ -1,0 +1,178 @@
+#Process Monitor
+#Author: @r3dQu1nn
+#Queries the processes at a set interval to see what processes have been started since that interval time
+#Thanks to @Alyssa (ramen0x3f) for the code snippets! Big thanks to @i_am_excite for the powershell code!
+#Big thanks to raffi for the on heartbeat help!
+
+#Global Variables
+$timer = "";
+$interval = "5m";
+include(script_resource("ProcessMonitor.ps1"));
+
+#Register Alias for Process Monitor
+beacon_command_register("ProcessMonitor", 
+	"Start/Stop and Change the Interval Time for Process Monitor",
+	"Synopsis: ProcessMonitor [Start/Stop] [Time]\n" .
+	"Options: 1m, 5m (default), 10m, 20m, 30m. If no time supplied, default of 5m is used.");
+
+#Process Monitor alias
+alias ProcessMonitor {
+	if ( $2 eq 'Start' && $3 eq '1m' ) {
+		if (-exists script_resource("ProcessMonitor.ps1")) {
+			$bid = $1;
+			$timer = "Start";
+			$interval = "1m";
+			blog($1, "\c9Process Monitor Started! Time Interval is set to " . $interval);
+			blog($1, "\c4Run ProcessMonitor [Stop] to stop ProcessMonitor from running continuously.");
+			blog($1, "\cBDepending on your sleep time, results might come before or after checkin.");
+			bpowershell_import!($1, script_resource("ProcessMonitor.ps1"));
+			bpowerpick!($1, 'Get-Proc 1');
+		}
+		else {
+			$timer = "";
+			$interval = "5m";
+			berror($1, "\c4ProcessMonitor.ps1 does not exist!");
+			show_message("ProcessMonitor.ps1 does not exist!");
+		}
+	}
+	else if ( $2 eq 'Start' && $3 eq '5m' ) {
+		if (-exists script_resource("ProcessMonitor.ps1")) {
+			$bid = $1;
+			$timer = "Start";
+			$interval = "5m";
+			blog($1, "\c9Process Monitor Started! Time Interval is set to " . $interval);
+			blog($1, "\c4Run ProcessMonitor [Stop] to stop ProcessMonitor from running continuously.");
+			blog($1, "\cBDepending on your sleep time, results might come before or after checkin.");
+			bpowershell_import!($1, script_resource("ProcessMonitor.ps1"));
+			bpowerpick!($1, 'Get-Proc 5');
+		}
+		else {
+			$timer = "";
+			$interval = "5m";
+			berror($1, "\c4ProcessMonitor.ps1 does not exist!");
+			show_message("ProcessMonitor.ps1 does not exist!");
+		}
+	}
+	else if ( $2 eq 'Start' && $3 eq '10m' ) {
+		if (-exists script_resource("ProcessMonitor.ps1")) {
+			$bid = $1;
+			$timer = "Start";
+			$interval = "10m";
+			blog($1, "\c9Process Monitor Started! Time Interval is set to " . $interval);
+			blog($1, "\c4Run ProcessMonitor [Stop] to stop ProcessMonitor from running continuously.");
+			blog($1, "\cBDepending on your sleep time, results might come before or after checkin.");
+			bpowershell_import!($1, script_resource("ProcessMonitor.ps1"));
+			bpowerpick!($1, 'Get-Proc 10');
+		}
+		else {
+			$timer = "";
+			$interval = "5m";
+			berror($1, "\c4ProcessMonitor.ps1 does not exist!");
+			show_message("ProcessMonitor.ps1 does not exist!");
+		}
+	}
+	else if ( $2 eq 'Start' && $3 eq '20m' ) {
+		if (-exists script_resource("ProcessMonitor.ps1")) {
+			$bid = $1;
+			$timer = "Start";
+			$interval = "20m";
+			blog($1, "\c9Process Monitor Started! Time Interval is set to " . $interval);
+			blog($1, "\c4Run ProcessMonitor [Stop] to stop ProcessMonitor from running continuously.");
+			blog($1, "\cBDepending on your sleep time, results might come before or after checkin.");
+			bpowershell_import!($1, script_resource("ProcessMonitor.ps1"));
+			bpowerpick!($1, 'Get-Proc 20');
+		}
+		else {
+			$timer = "";
+			$interval = "5m";
+			berror($1, "\c4ProcessMonitor.ps1 does not exist!");
+			show_message("ProcessMonitor.ps1 does not exist!");
+		}
+	}
+    else if ( $2 eq 'Start' && $3 eq '30m' ) {
+		if (-exists script_resource("ProcessMonitor.ps1")) {
+			$bid = $1;
+			$timer = "Start";
+			$interval = "30m";
+			blog($1, "\c9Process Monitor Started! Time Interval is set to " . $interval);
+			blog($1, "\c4Run ProcessMonitor [Stop] to stop ProcessMonitor from running continuously.");
+			blog($1, "\cBDepending on your sleep time, results might come before or after checkin.");
+			bpowershell_import!($1, script_resource("ProcessMonitor.ps1"));
+			bpowerpick!($1, 'Get-Proc 30');
+		}
+		else {
+			$timer = "";
+			$interval = "5m";
+			berror($1, "\c4ProcessMonitor.ps1 does not exist!");
+			show_message("ProcessMonitor.ps1 does not exist!");
+		}
+	}
+	else if ( $2 eq 'Stop' ) {
+		$timer = "Stop";
+		$interval = "5m";
+		blog($1, "\cBProcess Monitor has Stopped.");
+	}
+    else if ( $2 is $null ) {
+        blog($1, "\c4Please provide 'Start' then a correct time interval to Start Process Monitor.");
+        show_message("Please provide 'Start' then a correct time interval to Start Process Monitor.");
+    }
+	else if ( $3 != '1m' || $3 != '5m' || $3 != '10m' || $3 != '20m' || $3 != '30m' ) {
+        blog($1, "\c4Please provide a correct time interval to Start Process Monitor.");
+        show_message("Please provide a correct time interval to Start Process Monitor.");
+    }
+	else {
+		$timer = "";
+		$interval = "5m";
+	}
+}
+
+#Process Monitor heartbeat checks
+on heartbeat_1m {
+	if ( $timer eq 'Start' && $interval eq '1m' ) {
+		bpowerpick!($bid, 'Get-Proc 1');
+	}
+	else if ( $timer eq 'Stop' ) {
+	}
+	else {
+	}
+}
+
+on heartbeat_5m {
+	if ( $timer eq 'Start' && $interval eq '5m' ) {
+		bpowerpick!($bid, 'Get-Proc 5');
+	}
+	else if ( $timer eq 'Stop' ) {
+	}
+	else {
+	}
+}
+
+on heartbeat_10m {
+	if ( $timer eq 'Start' && $interval eq '10m' ) {
+		bpowerpick!($bid, 'Get-Proc 10');
+	}
+	else if ( $timer eq 'Stop' ) {
+	}
+	else {
+	}
+}
+
+on heartbeat_20m {
+	if ( $timer eq 'Start' && $interval eq '20m' ) {
+		bpowerpick!($bid, 'Get-Proc 20');
+	}
+	else if ( $timer eq 'Stop' ) {
+	}
+	else {
+	}
+}
+
+on heartbeat_30m {
+	if ( $timer eq 'Start' && $interval eq '30m' ) {
+		bpowerpick!($bid, 'Get-Proc 30');
+	}
+	else if ( $timer eq 'Stop' ) {
+	}
+	else {
+	}
+}
