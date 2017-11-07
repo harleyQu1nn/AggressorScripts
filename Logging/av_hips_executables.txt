@@ -121,6 +121,7 @@ ccapp.exe
 ccevtmgr.exe
 ccpxysvc.exe
 ccsvchst.exe
+ccSvcHst.exe
 cdp.exe
 cfd.exe
 cfgwiz.exe
@@ -486,8 +487,11 @@ shellspyinstall.exe
 shn.exe
 showbehind.exe
 smc.exe
+Smc.exe
+SmcGui.exe
 sms.exe
 smss32.exe
+SymCorpUI.exe
 soap.exe
 sofi.exe
 sperm.exe
