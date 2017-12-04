@@ -1,6 +1,8 @@
 #Color Coded Process Listing
 #Author: @r3dQu1nn
 #Takes the PS output in CS and color codes all AV processes, explorer process, browsers processes, and current process running
+#Thanks to @oldb00t for creating the original beacon-ps-highlight.cna script! Script here: https://github.com/oldb00t/AggressorScripts/tree/master/Ps-highlight
+#This script removes the need for the av_hips_executables.txt requirement
 
 set BEACON_OUTPUT_PS {
 
