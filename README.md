@@ -47,3 +47,12 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     * Script will be updated on occasion, feedback and more inputs are welcomed!
     
     ![redrepo](https://user-images.githubusercontent.com/27856212/30020754-00fedd70-9133-11e7-80d4-dff3be7ab876.PNG)
+    
+* ProcessColor.cna
+
+    * Color coded process listing without the file requirement.
+    
+    * Thanks to @oldb00t for the original version: https://github.com/oldb00t/AggressorScripts/tree/master/Ps-highlight
+    
+    ![process](https://user-images.githubusercontent.com/27856212/33582815-575d368e-d914-11e7-8d48-fd4c915af5d6.png)
+    
