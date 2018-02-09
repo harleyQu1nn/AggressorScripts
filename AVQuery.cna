@@ -16,7 +16,7 @@ beacon_command_register("AV_Query", "Queries the Registry for AV Installed",
 alias AV_Query {
 	
 	blog($1, "\cBDetermining what AntiVirus is installed...");
-	bpowershell!($1, $powershellcmd);
-	bshell!($1, "wmic /Namespace:\\\\root\\SecurityCenter2 Path AntiVirusProduct Get displayName,pathtoSignedProductExe");
+	bpowerpick!($1, $powershellcmd);
+	bpowerpick!($1, "wmic /Namespace:\\\\root\\SecurityCenter2 Path AntiVirusProduct Get displayName,pathtoSignedProductExe");
 		
 }
