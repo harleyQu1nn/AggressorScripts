@@ -17,6 +17,7 @@ alias AV_Query {
 	
 	blog($1, "\cBDetermining what AntiVirus is installed...");
 	bpowerpick!($1, $powershellcmd);
-	bpowerpick!($1, "Get-WmiObject -Namespace "root\SecurityCenter2" -Query "SELECT * FROM AntiVirusProduct" | select-object displayName,pathToSignedReportingExe,timestamp| fl");
+	bpause($1, int(30000));
+	bpowerpick!($1, "Get-WmiObject -Namespace \"root\\SecurityCenter2\" -Query \"SELECT * FROM AntiVirusProduct\" | select-object displayName,pathToSignedReportingExe,timestamp| fl");
 		
 }
