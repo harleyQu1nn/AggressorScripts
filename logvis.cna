@@ -126,3 +126,7 @@ popup view {
 		addTab("Beacon Command Log", createVisualization(), "All commands you have executed in a beacon");
 	}
 }
+
+on beacon_input {
+	updateTable();
+}
