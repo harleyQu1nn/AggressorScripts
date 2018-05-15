@@ -65,3 +65,11 @@
    * The Payload is a base64 encoded powershell payload based off your HTTP/HTTPS listener
    
    ![hkcu](https://user-images.githubusercontent.com/27856212/28122833-5bee8d72-66ed-11e7-8d0b-332f32627c62.png)
+   
+* Bitsadmin.cna
+
+   * Creates a bitsadmin job that executes on reboot
+
+   * Currently works on Windows 7, 8, Server 2008, Server 2012
+
+   ![bits](https://user-images.githubusercontent.com/27856212/40030114-f1bb39d2-57a5-11e8-9b99-ea076a852503.png)
