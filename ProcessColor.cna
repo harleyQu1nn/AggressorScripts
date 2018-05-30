@@ -27,7 +27,7 @@ set BEACON_OUTPUT_PS {
 		} else if ($name eq "explorer.exe" || $name eq "winlogon.exe") {
 		push(@ps, %(pid => $pid, entry => "\c2 $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user \o"));
 		# highlight browsers processes in GREEN
-		} else if ($name eq "chrome.exe" || $name eq "firefox.exe" || $name eq "iexplore.exe") {
+		} else if ($name eq "chrome.exe" || $name eq "firefox.exe" || $name eq "iexplore.exe" || $name eq "MicrosoftEdgeCP.exe" ) {
 		push(@ps, %(pid => $pid, entry => "\c3 $[5]pid $[5]ppid $[28]name $[5]arch $[11]session $user \o"));
 		# highlight current process in YELLOW
 		} else if ($pid eq $bd['pid']) {
