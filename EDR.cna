@@ -1,7 +1,7 @@
 #EDR Query
 #Author: @r3dQu1nn
 
-@edr = @("carbonblackk.sys", "parity.sys", "csacentr.sys", "csaenh.sys", "csareg.sys", "csascr.sys", "csaav.sys", "csaam.sys", "esensor.dll", "fsgk.sys", "fsatp.sys", "fshs.sys", "eaw.sys", "im.sys", "csagent.sys", "rvsavd.sys", "dgdmk.sys", "atrsdfw.sys", "mbamwatchdog.sys", "edevmon.sys", "SentinelMonitor.sys", "edrsensor.sys", "ehdrv.sys", "HexisFSMonitor.sys", "CyOptics.sys", "CarbonBlackK.sys", "CyProtectDrv32.sys", "CyProtectDrv64.sys", "CRExecPrev.sys", "ssfmonm.sys", "CybKernelTracker.sys", "SAVOnAccess.sys", "savonaccess.sys", "sld.sys", "aswSP.sys", "FeKern.sys", "klifks.sys", "klifaa.sys", "Klifsm.sys", "mfeaskm.sys", "mfencfilter.sys", "WFP_MRT.sys", "groundling32.sys", "SAFE-Agent.sys", "groundling64.sys", "avgtpx86.sys", "avgtpx64.sys", "pgpwdefs.sys", "GEProtection.sys", "diflt.sys", "sysMon.sys", "ssrfsf.sys", "emxdrv2.sys", "reghook.sys", "spbbcdrv.sys", "bhdrvx86.sys", "bhdrvx64.sys", "SISIPSFileFilter.sys", "symevent.sys", "VirtualAgent.sys", "vxfsrep.sys", "VirtFile.sys", "SymAFR.sys", "symefasi.sys", "symefa.sys", "symefa64.sys", "SymHsm.sys", "evmf.sys", "GEFCMP.sys", "VFSEnc.sys", "pgpfs.sys", "fencry.sys", "symrg.sys", "cfrmd.sys", "cmdccav.sys", "cmdguard.sys", "CmdMnEfs.sys", "MyDLPMF.sys", "PSINPROC.SYS", "PSINFILE.SYS", "amfsm.sys", "amm8660.sys", "amm6460.sys");
+@edr = @("carbonblackk.sys", "parity.sys", "csacentr.sys", "csaenh.sys", "csareg.sys", "csascr.sys", "csaav.sys", "csaam.sys", "esensor.sys", "fsgk.sys", "fsatp.sys", "fshs.sys", "eaw.sys", "im.sys", "csagent.sys", "rvsavd.sys", "dgdmk.sys", "atrsdfw.sys", "mbamwatchdog.sys", "edevmon.sys", "SentinelMonitor.sys", "edrsensor.sys", "ehdrv.sys", "HexisFSMonitor.sys", "CyOptics.sys", "CarbonBlackK.sys", "CyProtectDrv32.sys", "CyProtectDrv64.sys", "CRExecPrev.sys", "ssfmonm.sys", "CybKernelTracker.sys", "SAVOnAccess.sys", "savonaccess.sys", "sld.sys", "aswSP.sys", "FeKern.sys", "klifks.sys", "klifaa.sys", "Klifsm.sys", "mfeaskm.sys", "mfencfilter.sys", "WFP_MRT.sys", "groundling32.sys", "SAFE-Agent.sys", "groundling64.sys", "avgtpx86.sys", "avgtpx64.sys", "pgpwdefs.sys", "GEProtection.sys", "diflt.sys", "sysMon.sys", "ssrfsf.sys", "emxdrv2.sys", "reghook.sys", "spbbcdrv.sys", "bhdrvx86.sys", "bhdrvx64.sys", "SISIPSFileFilter.sys", "symevent.sys", "VirtualAgent.sys", "vxfsrep.sys", "VirtFile.sys", "SymAFR.sys", "symefasi.sys", "symefa.sys", "symefa64.sys", "SymHsm.sys", "evmf.sys", "GEFCMP.sys", "VFSEnc.sys", "pgpfs.sys", "fencry.sys", "symrg.sys", "cfrmd.sys", "cmdccav.sys", "cmdguard.sys", "CmdMnEfs.sys", "MyDLPMF.sys", "PSINPROC.SYS", "PSINFILE.SYS", "amfsm.sys", "amm8660.sys", "amm6460.sys");
 
 #EDR_Query Command Register
 beacon_command_register("EDR_Query", "Queries the System for all major EDR products installed",
@@ -67,7 +67,7 @@ sub list {
     if ('HexisFSMonitor.sys' in @matches) {
         blog($1, "Hexis Cyber Solutions Found!");
     }
-    if ('CyOptics.sys' in @matches || 'CyProtectDrv32.sys' in @matches || 'CyProtectDrv64.sys.sys' in @matches) {
+    if ('CyOptics.sys' in @matches || 'CyProtectDrv32.sys' in @matches || 'CyProtectDrv64.sys' in @matches) {
         blog($1, "Cylance Inc. Found!");
     }
     if ('aswSP.sys' in @matches) {
@@ -100,7 +100,7 @@ sub list {
     if ('ssfmonm.sys' in @matches) {
         blog($1, "Webroot Software, Inc. Found!");
     }
-    if ('CarbonBlackK.sys' in @matches || 'carbonblackk.sys') {
+    if ('CarbonBlackK.sys' in @matches || 'carbonblackk.sys' in @matches) {
         blog($1, "Carbon Black Found!");
     }
     if ('CRExecPrev.sys' in @matches) {
@@ -118,7 +118,7 @@ sub list {
     if ('fsgk.sys' in @matches || 'fsatp.sys' in @matches || 'fshs.sys' in @matches) {
         blog($1, "F-Secure Found!");
     }
-    if ('esensor.dll' in @matches) {
+    if ('esensor.sys' in @matches) {
         blog($1, "Endgame Found!");
     }
     if ('csacentr.sys' in @matches || 'csaenh.sys' in @matches || 'csareg.sys' in @matches || 'csascr.sys' in @matches || 'csaav.sys' in @matches || 'csaam.sys' in @matches) {
