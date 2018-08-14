@@ -6,7 +6,7 @@
 #EDR_Query Command Register
 beacon_command_register("EDR_Query", "Queries the System for all major EDR products installed",
 	"Syntax: EDR_Query\n" .
-	"Checks C:\\Windows\\System32\\drivers and C:\\Windows\\System32\\DriverStore\\FileRepository for installed EDR products");
+	"Checks C:\\Windows\\System32\\drivers for installed EDR products");
 
 #EDR_Query alias
 alias EDR_Query {
