@@ -101,7 +101,7 @@ sub list {
     if ('ssfmonm.sys' in @matches) {
         blog($1, "Webroot Software, Inc. Found!");
     }
-    if ('CarbonBlackK.sys' in @matches || 'carbonblackk.sys') {
+    if ('CarbonBlackK.sys' in @matches || 'carbonblackk.sys' in @matches) {
         blog($1, "Carbon Black Found!");
     }
     if ('CRExecPrev.sys' in @matches) {
