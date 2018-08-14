@@ -1,12 +1,12 @@
 #EDR Query
 #Author: @r3dQu1nn
 
-@edr = @("carbonblackk.sys", "parity.sys", "csacentr.sys", "csaenh.sys", "csareg.sys", "csascr.sys", "csaav.sys", "csaam.sys", "esensor.sys", "fsgk.sys", "fsatp.sys", "fshs.sys", "eaw.sys", "im.sys", "csagent.sys", "rvsavd.sys", "dgdmk.sys", "atrsdfw.sys", "mbamwatchdog.sys", "edevmon.sys", "SentinelMonitor.sys", "edrsensor.sys", "ehdrv.sys", "HexisFSMonitor.sys", "CyOptics.sys", "CarbonBlackK.sys", "CyProtectDrv32.sys", "CyProtectDrv64.sys", "CRExecPrev.sys", "ssfmonm.sys", "CybKernelTracker.sys", "SAVOnAccess.sys", "savonaccess.sys", "sld.sys", "aswSP.sys", "FeKern.sys", "klifks.sys", "klifaa.sys", "Klifsm.sys", "mfeaskm.sys", "mfencfilter.sys", "WFP_MRT.sys", "groundling32.sys", "SAFE-Agent.sys", "groundling64.sys", "avgtpx86.sys", "avgtpx64.sys", "pgpwdefs.sys", "GEProtection.sys", "diflt.sys", "sysMon.sys", "ssrfsf.sys", "emxdrv2.sys", "reghook.sys", "spbbcdrv.sys", "bhdrvx86.sys", "bhdrvx64.sys", "SISIPSFileFilter.sys", "symevent.sys", "VirtualAgent.sys", "vxfsrep.sys", "VirtFile.sys", "SymAFR.sys", "symefasi.sys", "symefa.sys", "symefa64.sys", "SymHsm.sys", "evmf.sys", "GEFCMP.sys", "VFSEnc.sys", "pgpfs.sys", "fencry.sys", "symrg.sys", "cfrmd.sys", "cmdccav.sys", "cmdguard.sys", "CmdMnEfs.sys", "MyDLPMF.sys", "PSINPROC.SYS", "PSINFILE.SYS", "amfsm.sys", "amm8660.sys", "amm6460.sys");
+@edr = @("libwamf.sys", "LRAgentMF.sys", "BrCow_x_x_x_x.sys", "brfilter.sys", "BDSandBox.sys", "TRUFOS.SYS", "AVC3.SYS", "Atc.sys", "AVCKF.SYS", "bddevflt.sys", "gzflt.sys", "bdsvm.sys", "hbflt.sys", "cve.sys", "psepfilter.sys", "cposfw.sys", "dsfa.sys", "medlpflt.sys", "epregflt.sys", "TmFileEncDmk.sys", "tmevtmgr.sys", "TmEsFlt.sys", "fileflt.sys", "SakMFile.sys", "SakFile.sys", "AcDriver.sys", "TMUMH.sys", "hfileflt.sys", "TMUMS.sys", "MfeEEFF.sys", "mfprom.sys", "hdlpflt.sys", "swin.sys", "mfehidk.sys", "mfencoas.sys", "epdrv.sys", "carbonblackk.sys", "csacentr.sys", "csaenh.sys", "csareg.sys", "csascr.sys", "csaav.sys", "csaam.sys", "esensor.sys", "fsgk.sys", "fsatp.sys", "fshs.sys", "eaw.sys", "im.sys", "csagent.sys", "rvsavd.sys", "dgdmk.sys", "atrsdfw.sys", "mbamwatchdog.sys", "edevmon.sys", "SentinelMonitor.sys", "edrsensor.sys", "ehdrv.sys", "HexisFSMonitor.sys", "CyOptics.sys", "CarbonBlackK.sys", "CyProtectDrv32.sys", "CyProtectDrv64.sys", "CRExecPrev.sys", "ssfmonm.sys", "CybKernelTracker.sys", "SAVOnAccess.sys", "savonaccess.sys", "sld.sys", "aswSP.sys", "FeKern.sys", "klifks.sys", "klifaa.sys", "Klifsm.sys", "mfeaskm.sys", "mfencfilter.sys", "WFP_MRT.sys", "groundling32.sys", "SAFE-Agent.sys", "groundling64.sys", "avgtpx86.sys", "avgtpx64.sys", "pgpwdefs.sys", "GEProtection.sys", "diflt.sys", "sysMon.sys", "ssrfsf.sys", "emxdrv2.sys", "reghook.sys", "spbbcdrv.sys", "bhdrvx86.sys", "bhdrvx64.sys", "SISIPSFileFilter.sys", "symevent.sys", "VirtualAgent.sys", "vxfsrep.sys", "VirtFile.sys", "SymAFR.sys", "symefasi.sys", "symefa.sys", "symefa64.sys", "SymHsm.sys", "evmf.sys", "GEFCMP.sys", "VFSEnc.sys", "pgpfs.sys", "fencry.sys", "symrg.sys", "cfrmd.sys", "cmdccav.sys", "cmdguard.sys", "CmdMnEfs.sys", "MyDLPMF.sys", "PSINPROC.SYS", "PSINFILE.SYS", "amfsm.sys", "amm8660.sys", "amm6460.sys");
 
 #EDR_Query Command Register
 beacon_command_register("EDR_Query", "Queries the System for all major EDR products installed",
 	"Syntax: EDR_Query\n" .
-	"Checks C:\\Windows\\System32\\drivers for all EDR products installed");
+	"Checks C:\\Windows\\System32\\drivers and C:\\Windows\\System32\\DriverStore\\FileRepository for installed EDR products");
 
 #EDR_Query alias
 alias EDR_Query {
@@ -33,6 +33,7 @@ sub list {
     $out .= "\c0    ----------------------";
     if (size(@matches) == 0) {
         blog($1, "\c9No EDR products found! Operate at your own risk!");
+        clear(@matches);
     }
     if (size(@matches) > 0) {
         blog($1, $out);
@@ -61,8 +62,8 @@ sub list {
     if ('SentinelMonitor.sys' in @matches) {
         blog($1, "SentinelOne Found!");
     }
-    if ('edrsensor.sys' in @matches) {
-        blog($1, "BitDefender SRL Found!");
+    if ('edrsensor.sys' in @matches || 'hbflt.sys' in @matches || 'bdsvm.sys' in @matches || 'gzflt.sys' in @matches || 'bddevflt.sys' in @matches || 'AVCKF.SYS' in @matches || 'Atc.sys' in @matches || 'AVC3.SYS' in @matches || 'TRUFOS.SYS' in @matches || 'BDSandBox.sys' in @matches) {
+        blog($1, "BitDefender Found!");
     }
     if ('HexisFSMonitor.sys' in @matches) {
         blog($1, "Hexis Cyber Solutions Found!");
@@ -73,7 +74,7 @@ sub list {
     if ('aswSP.sys' in @matches) {
         blog($1, "Avast Found!");
     }
-    if ('mfeaskm.sys' in @matches || 'mfencfilter.sys' in @matches) {
+    if ('mfeaskm.sys' in @matches || 'mfencfilter.sys' in @matches || 'epdrv.sys' in @matches || 'mfencoas.sys' in @matches || 'mfehidk.sys' in @matches || 'swin.sys' in @matches || 'hdlpflt.sys' in @matches || 'mfprom.sys' in @matches || 'MfeEEFF.sys' in @matches) {
         blog($1, "McAfee Found!");
     }
     if ('groundling32.sys' in @matches || 'groundling64.sys' in @matches) {
@@ -100,7 +101,7 @@ sub list {
     if ('ssfmonm.sys' in @matches) {
         blog($1, "Webroot Software, Inc. Found!");
     }
-    if ('CarbonBlackK.sys' in @matches || 'carbonblackk.sys' in @matches) {
+    if ('CarbonBlackK.sys' in @matches || 'carbonblackk.sys') {
         blog($1, "Carbon Black Found!");
     }
     if ('CRExecPrev.sys' in @matches) {
@@ -124,7 +125,22 @@ sub list {
     if ('csacentr.sys' in @matches || 'csaenh.sys' in @matches || 'csareg.sys' in @matches || 'csascr.sys' in @matches || 'csaav.sys' in @matches || 'csaam.sys' in @matches) {
         blog($1, "Cisco Found!");
     }
-    if ('parity.sys' in @matches) {
-    	blog($1, "Carbon Black Protect Found!");
+    if ('TMUMS.sys' in @matches || 'hfileflt.sys' in @matches || 'TMUMH.sys' in @matches || 'AcDriver.sys' in @matches || 'SakFile.sys' in @matches || 'SakMFile.sys' in @matches || 'fileflt.sys' in @matches || 'TmEsFlt.sys' in @matches || 'tmevtmgr.sys' in @matches || 'TmFileEncDmk.sys' in @matches) {
+        blog($1, "Trend Micro Inc Found!");
+    }
+    if ('epregflt.sys' in @matches || 'medlpflt.sys' in @matches || 'dsfa.sys' in @matches || 'cposfw.sys' in @matches) {
+        blog($1, "Check Point Software Technologies Found!");
+    }
+    if ('psepfilter.sys' in @matches || 'cve.sys' in @matches) {
+        blog($1, "Absolute Found!");
+    }
+    if ('brfilter.sys' in @matches || 'BrCow_x_x_x_x.sys' in @matches) {
+        blog($1, "Bromium Found!");
+    }
+    if ('LRAgentMF.sys' in @matches) {
+        blog($1, "LogRhythm Found!");
+    }
+    if ('libwamf.sys' in @matches) {
+        blog($1, "OPSWAT Inc Found!");
     }
 }
