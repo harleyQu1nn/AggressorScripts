@@ -83,7 +83,7 @@ sub list {
     if ('avgtpx86.sys' in @matches || 'avgtpx64.sys' in @matches) {
         blog($1, "AVG Technologies Found!");
     }
-    if ('pgpwdefs.sys' in @matches || 'GEProtection.sys' in @matches || 'diflt.sys' in @matches || 'sysMon.sys' in @matches || 'ssrfsf.sys' in @matches || 'emxdrv2.sys' in @matches || 'reghook.sys' in @matches || 'spbbcdrv.sys' in @matches || 'bhdrvx86.sys' in @matches || 'bhdrvx64.sys' in @matches || 'SISIPSFileFilter' in @matches || 'symevent.sys' in @matches || 'vxfsrep.sys' in @matches || 'VirtFile.sys' in @matches || 'SymAFR.sys' in @matches || 'symefasi.sys' in @matches || 'symefa.sys' in @matches || 'symefa64.sys' in @matches || 'SymHsm.sys' in @matches || 'evmf.sys' in @matches || 'GEFCMP.sys' in @matches || 'VFSEnc.sys' in @matches || 'pgpfs.sys' in @matches || 'fencry.sys' in @matches || 'symrg.sys' in @matches) {
+    if ('pgpwdefs.sys' in @matches || 'GEProtection.sys' in @matches || 'diflt.sys' in @matches || 'sysMon.sys' in @matches || 'ssrfsf.sys' in @matches || 'emxdrv2.sys' in @matches || 'reghook.sys' in @matches || 'spbbcdrv.sys' in @matches || 'bhdrvx86.sys' in @matches || 'bhdrvx64.sys' in @matches || 'SISIPSFileFilter.sys' in @matches || 'symevent.sys' in @matches || 'vxfsrep.sys' in @matches || 'VirtFile.sys' in @matches || 'SymAFR.sys' in @matches || 'symefasi.sys' in @matches || 'symefa.sys' in @matches || 'symefa64.sys' in @matches || 'SymHsm.sys' in @matches || 'evmf.sys' in @matches || 'GEFCMP.sys' in @matches || 'VFSEnc.sys' in @matches || 'pgpfs.sys' in @matches || 'fencry.sys' in @matches || 'symrg.sys' in @matches) {
         blog($1, "Symantec Found!");
     }               
     if ('SAFE-Agent.sys' in @matches) {
