@@ -5,13 +5,20 @@
 
 #EDR_Query Command Register
 beacon_command_register("EDR_Query", "Queries the System for all major EDR products installed",
-	"Syntax: EDR_Query\n" .
-	"Checks C:\\Windows\\System32\\drivers for installed EDR products");
+    "Syntax: EDR_Query\n" .
+    "Checks C:\\Windows\\System32\\drivers for installed EDR products");
 
 #EDR_Query alias
 alias EDR_Query {
-    blog($1, "\cBDetermining what EDR products are installed...");
-    bls($1, "c:\\windows\\sysnative\\drivers", &list);
+    $bd = bdata($1);
+    if ($bd['barch'] eq "x64") {
+        blog($1, "\cBDetermining what EDR products are installed...");
+        bls($1, "C:\\windows\\System32\\drivers", &list);
+    }
+    else {
+        blog($1, "\cBDetermining what EDR products are installed...");
+        bls($1, "C:\\windows\\sysnative\\drivers", &list);
+    }
 }
 
 #Parse dem results
