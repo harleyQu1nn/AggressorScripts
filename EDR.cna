@@ -11,7 +11,7 @@ beacon_command_register("EDR_Query", "Queries the System for all major EDR produ
 #EDR_Query alias
 alias EDR_Query {
     blog($1, "\cBDetermining what EDR products are installed...");
-    bls($1, "C:\\Windows\\System32\\drivers", &list);
+    bls($1, "c:\\windows\\sysnative\\drivers", &list);
 }
 
 #Parse dem results
