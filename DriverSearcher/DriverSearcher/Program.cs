@@ -85,7 +85,7 @@ namespace DriverSearcher
                     case "ssfmonm.sys":
                         matches.Add(filename, "Webroot Software, Inc. Found!");
                         break;
-                    case "carbonblackk.sys":
+                    case "carbonblackk.sys": case "Parity.sys": case "cbk7.sys": case "cbstream.sys":
                         matches.Add(filename, "Carbon Black Found!");
                         break;
                     case "crexecprev.sys":
