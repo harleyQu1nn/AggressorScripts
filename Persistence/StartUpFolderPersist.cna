@@ -24,3 +24,9 @@ sub persistThroughStartUpFolder {
 	dbutton_action($dialog, "Create");
 	dialog_show($dialog);
 }
+
+popup beacon_bottom {
+	item "Windows StartUp Folder Persistence" {
+		persistThroughStartUpFolder($1);
+	}
+}
