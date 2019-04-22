@@ -1,36 +1,74 @@
-#EDR Query
-#Author: @r3dQu1nn
+#EDR.cna
+#Author: @r3dqu1nn
+#Remotely query a system for EDR products
 
-@edr = @("cbstream.sys", "cbk7.sys", "Parity.sys", "libwamf.sys", "LRAgentMF.sys", "BrCow_x_x_x_x.sys", "brfilter.sys", "BDSandBox.sys", "TRUFOS.SYS", "AVC3.SYS", "Atc.sys", "AVCKF.SYS", "bddevflt.sys", "gzflt.sys", "bdsvm.sys", "hbflt.sys", "cve.sys", "psepfilter.sys", "cposfw.sys", "dsfa.sys", "medlpflt.sys", "epregflt.sys", "TmFileEncDmk.sys", "tmevtmgr.sys", "TmEsFlt.sys", "fileflt.sys", "SakMFile.sys", "SakFile.sys", "AcDriver.sys", "TMUMH.sys", "hfileflt.sys", "TMUMS.sys", "MfeEEFF.sys", "mfprom.sys", "hdlpflt.sys", "swin.sys", "mfehidk.sys", "mfencoas.sys", "epdrv.sys", "carbonblackk.sys", "csacentr.sys", "csaenh.sys", "csareg.sys", "csascr.sys", "csaav.sys", "csaam.sys", "esensor.sys", "fsgk.sys", "fsatp.sys", "fshs.sys", "eaw.sys", "im.sys", "csagent.sys", "rvsavd.sys", "dgdmk.sys", "atrsdfw.sys", "mbamwatchdog.sys", "edevmon.sys", "SentinelMonitor.sys", "edrsensor.sys", "ehdrv.sys", "HexisFSMonitor.sys", "CyOptics.sys", "CarbonBlackK.sys", "CyProtectDrv32.sys", "CyProtectDrv64.sys", "CRExecPrev.sys", "ssfmonm.sys", "CybKernelTracker.sys", "SAVOnAccess.sys", "savonaccess.sys", "sld.sys", "aswSP.sys", "FeKern.sys", "klifks.sys", "klifaa.sys", "Klifsm.sys", "mfeaskm.sys", "mfencfilter.sys", "WFP_MRT.sys", "groundling32.sys", "SAFE-Agent.sys", "groundling64.sys", "avgtpx86.sys", "avgtpx64.sys", "pgpwdefs.sys", "GEProtection.sys", "diflt.sys", "sysMon.sys", "ssrfsf.sys", "emxdrv2.sys", "reghook.sys", "spbbcdrv.sys", "bhdrvx86.sys", "bhdrvx64.sys", "SISIPSFileFilter.sys", "symevent.sys", "VirtualAgent.sys", "vxfsrep.sys", "VirtFile.sys", "SymAFR.sys", "symefasi.sys", "symefa.sys", "symefa64.sys", "SymHsm.sys", "evmf.sys", "GEFCMP.sys", "VFSEnc.sys", "pgpfs.sys", "fencry.sys", "symrg.sys", "cfrmd.sys", "cmdccav.sys", "cmdguard.sys", "CmdMnEfs.sys", "MyDLPMF.sys", "PSINPROC.SYS", "PSINFILE.SYS", "amfsm.sys", "amm8660.sys", "amm6460.sys");
+@edr = @("CiscoAMPCEFWDriver.sys", "CiscoAMPHeurDriver.sys", "cbstream.sys", "cbk7.sys", "Parity.sys", "libwamf.sys", "LRAgentMF.sys", "BrCow_x_x_x_x.sys", "brfilter.sys", "BDSandBox.sys", "TRUFOS.SYS", "AVC3.SYS", "Atc.sys", "AVCKF.SYS", "bddevflt.sys", "gzflt.sys", "bdsvm.sys", "hbflt.sys", "cve.sys", "psepfilter.sys", "cposfw.sys", "dsfa.sys", "medlpflt.sys", "epregflt.sys", "TmFileEncDmk.sys", "tmevtmgr.sys", "TmEsFlt.sys", "fileflt.sys", "SakMFile.sys", "SakFile.sys", "AcDriver.sys", "TMUMH.sys", "hfileflt.sys", "TMUMS.sys", "MfeEEFF.sys", "mfprom.sys", "hdlpflt.sys", "swin.sys", "mfehidk.sys", "mfencoas.sys", "epdrv.sys", "carbonblackk.sys", "csacentr.sys", "csaenh.sys", "csareg.sys", "csascr.sys", "csaav.sys", "csaam.sys", "esensor.sys", "fsgk.sys", "fsatp.sys", "fshs.sys", "eaw.sys", "im.sys", "csagent.sys", "rvsavd.sys", "dgdmk.sys", "atrsdfw.sys", "mbamwatchdog.sys", "edevmon.sys", "SentinelMonitor.sys", "edrsensor.sys", "ehdrv.sys", "HexisFSMonitor.sys", "CyOptics.sys", "CarbonBlackK.sys", "CyProtectDrv32.sys", "CyProtectDrv64.sys", "CRExecPrev.sys", "ssfmonm.sys", "CybKernelTracker.sys", "SAVOnAccess.sys", "savonaccess.sys", "sld.sys", "aswSP.sys", "FeKern.sys", "klifks.sys", "klifaa.sys", "Klifsm.sys", "mfeaskm.sys", "mfencfilter.sys", "WFP_MRT.sys", "groundling32.sys", "SAFE-Agent.sys", "groundling64.sys", "avgtpx86.sys", "avgtpx64.sys", "pgpwdefs.sys", "GEProtection.sys", "diflt.sys", "sysMon.sys", "ssrfsf.sys", "emxdrv2.sys", "reghook.sys", "spbbcdrv.sys", "bhdrvx86.sys", "bhdrvx64.sys", "SISIPSFileFilter.sys", "symevent.sys", "VirtualAgent.sys", "vxfsrep.sys", "VirtFile.sys", "SymAFR.sys", "symefasi.sys", "symefa.sys", "symefa64.sys", "SymHsm.sys", "evmf.sys", "GEFCMP.sys", "VFSEnc.sys", "pgpfs.sys", "fencry.sys", "symrg.sys", "cfrmd.sys", "cmdccav.sys", "cmdguard.sys", "CmdMnEfs.sys", "MyDLPMF.sys", "PSINPROC.SYS", "PSINFILE.SYS", "amfsm.sys", "amm8660.sys", "amm6460.sys");
 
-#EDR_Query Command Register
-beacon_command_register("EDR_Query", "Queries the System for all major EDR products installed",
-    "Syntax: EDR_Query\n" .
-    "Checks C:\\Windows\\System32\\drivers for installed EDR products");
+#edr_query Command Register
+beacon_command_register("edr_query", "Queries the remote or local system for all major EDR products installed",
+    "Syntax: edr_query [hostname] [arch]\n" .
+    "Checks the local or remote system for installed EDR products. **Note: Use localhost for [hostname] to query the local system**");
 
-#EDR_Query alias
-alias EDR_Query {
-    $bd = bdata($1);
-    if ($bd['barch'] eq "x64") {
-        blog($1, "\cBDetermining what EDR products are installed...");
-        bls($1, "C:\\windows\\System32\\drivers", &list);
+#edr_query alias
+alias edr_query {
+	$bid = $1;
+    if ($2 is $null) {
+		blog($bid, "\c4Please enter a remote hostname or localhost!");
+		show_message("Please enter a remote hostname or localhost!");
+	}
+	else if ($3 is $null) {
+		blog($bid, "\c4Please enter a valid architechture!");
+		show_message("Please enter a valid architechture!");
+	}
+    else if ($3 ismatch 'x64') {
+        blog($bid, "\cBDetermining what EDR products are installed on ". $2 ."...");
+        bls($bid, "\\\\". $2 ."\\C\$\\windows\\system32\\drivers", &list);
     }
-    else {
-        blog($1, "\cBDetermining what EDR products are installed...");
-        bls($1, "C:\\windows\\sysnative\\drivers", &list);
+    else if ($3 ismatch 'x86') {
+        blog($bid, "\cBDetermining what EDR products are installed on ". $2 ."...");
+        bls($bid, "\\\\". $2 ."\\C\$\\windows\\sysnative\\drivers", &list);
     }
-    
+}
+
+sub query {
+	
+	$bid = $1;
+	$dialog = dialog("EDR Query Menu", %(hostname => "Enter Remote HostName", Arch => ""), &EDR);
+	dialog_description($dialog, "EDR Query Menu. Remotely query a system for EDR products. Hostname field (IP or Hostname) is Mandatory! **Note: Use localhost for the local system.**");
+	drow_text($dialog, "hostname", "Target HostName:");
+	drow_combobox($dialog, "Arch", "Target Architechture:", @("x86", "x64"));
+	dbutton_action($dialog, "Execute");
+	dialog_show($dialog);
+
+}
+
+sub EDR {
+
+	if ($3['hostname'] ismatch 'Enter Remote HostName') {
+		show_message("Please enter a remote hostname or localhost!");
+		blog($bid, "\c4Please enter a remote hostname or localhost!");
+	}
+	else if ($3['Arch'] ismatch 'x86') {
+		bls($bid, "\\\\". $3['hostname'] ."\\C\$\\windows\\sysnative\\drivers", &list);
+		blog($bid, "\cBDetermining what EDR products are installed on ". $3['hostname']. "...");
+	}
+	else if ($3['Arch'] ismatch 'x64') {
+		bls($bid, "\\\\". $3['hostname'] ."\\C\$\\windows\\system32\\drivers", &list);
+		blog($bid, "\cBDetermining what EDR products are installed on ". $3['hostname']. "...");
+	}
+
 }
 
 #Parse dem results
 sub list {
+
     local('$entry $type $size $modified $name $out');
     @results = split("\n", ["$3" trim]);
     @matches = @();
     foreach $entry (@results) {
     ($type, $size, $modified, $name) = split("\t", $entry);
         if ($name in @edr) {
-            blog($1, "\cB$name Found");
+            blog($bid, "\cB$name Found");
             add(@matches, $name, 0);
         }
     }
@@ -40,115 +78,121 @@ sub list {
     $out .= "    | Vendor Information | \n";
     $out .= "\c0    ----------------------";
     if (size(@matches) == 0) {
-        blog($1, "\c9No EDR products found! Operate at your own risk!");
+        blog($bid, "\c9No EDR products found! Operate at your own risk!");
         clear(@matches);
     }
     if (size(@matches) > 0) {
-        blog($1, $out);
+        blog($bid, $out);
     }
     if ('FeKern.sys' in @matches || 'WFP_MRT.sys' in @matches) {
-        blog($1, "FireEye Found!");
+        blog($bid, "FireEye Found!");
     }
     if ('eaw.sys' in @matches) {
-        blog($1, "Raytheon Cyber Solutions Found!");
+        blog($bid, "Raytheon Cyber Solutions Found!");
     }
     if ('rvsavd.sys' in @matches) {
-        blog($1, "CJSC Returnil Software Found!");
+        blog($bid, "CJSC Returnil Software Found!");
     }
     if ('dgdmk.sys' in @matches) {
-        blog($1, "Verdasys Inc. Found!");
+        blog($bid, "Verdasys Inc. Found!");
     }
     if ('atrsdfw.sys' in @matches) {
-        blog($1, "Altiris (Symantec) Found!");
+        blog($bid, "Altiris (Symantec) Found!");
     }
     if ('mbamwatchdog.sys' in @matches) {
-        blog($1, "Malwarebytes Found!");
+        blog($bid, "Malwarebytes Found!");
     }
     if ('edevmon.sys' in @matches || 'ehdrv.sys' in @matches) {
-        blog($1, "ESET Found!");
+        blog($bid, "ESET Found!");
     }
     if ('SentinelMonitor.sys' in @matches) {
-        blog($1, "SentinelOne Found!");
+        blog($bid, "SentinelOne Found!");
     }
     if ('edrsensor.sys' in @matches || 'hbflt.sys' in @matches || 'bdsvm.sys' in @matches || 'gzflt.sys' in @matches || 'bddevflt.sys' in @matches || 'AVCKF.SYS' in @matches || 'Atc.sys' in @matches || 'AVC3.SYS' in @matches || 'TRUFOS.SYS' in @matches || 'BDSandBox.sys' in @matches) {
-        blog($1, "BitDefender Found!");
+        blog($bid, "BitDefender Found!");
     }
     if ('HexisFSMonitor.sys' in @matches) {
-        blog($1, "Hexis Cyber Solutions Found!");
+        blog($bid, "Hexis Cyber Solutions Found!");
     }
     if ('CyOptics.sys' in @matches || 'CyProtectDrv32.sys' in @matches || 'CyProtectDrv64.sys' in @matches) {
-        blog($1, "Cylance Inc. Found!");
+        blog($bid, "Cylance Inc. Found!");
     }
     if ('aswSP.sys' in @matches) {
-        blog($1, "Avast Found!");
+        blog($bid, "Avast Found!");
     }
     if ('mfeaskm.sys' in @matches || 'mfencfilter.sys' in @matches || 'epdrv.sys' in @matches || 'mfencoas.sys' in @matches || 'mfehidk.sys' in @matches || 'swin.sys' in @matches || 'hdlpflt.sys' in @matches || 'mfprom.sys' in @matches || 'MfeEEFF.sys' in @matches) {
-        blog($1, "McAfee Found!");
+        blog($bid, "McAfee Found!");
     }
     if ('groundling32.sys' in @matches || 'groundling64.sys' in @matches) {
-        blog($1, "Dell Secureworks Found!");
+        blog($bid, "Dell Secureworks Found!");
     }
     if ('avgtpx86.sys' in @matches || 'avgtpx64.sys' in @matches) {
-        blog($1, "AVG Technologies Found!");
+        blog($bid, "AVG Technologies Found!");
     }
     if ('pgpwdefs.sys' in @matches || 'GEProtection.sys' in @matches || 'diflt.sys' in @matches || 'sysMon.sys' in @matches || 'ssrfsf.sys' in @matches || 'emxdrv2.sys' in @matches || 'reghook.sys' in @matches || 'spbbcdrv.sys' in @matches || 'bhdrvx86.sys' in @matches || 'bhdrvx64.sys' in @matches || 'SISIPSFileFilter.sys' in @matches || 'symevent.sys' in @matches || 'vxfsrep.sys' in @matches || 'VirtFile.sys' in @matches || 'SymAFR.sys' in @matches || 'symefasi.sys' in @matches || 'symefa.sys' in @matches || 'symefa64.sys' in @matches || 'SymHsm.sys' in @matches || 'evmf.sys' in @matches || 'GEFCMP.sys' in @matches || 'VFSEnc.sys' in @matches || 'pgpfs.sys' in @matches || 'fencry.sys' in @matches || 'symrg.sys' in @matches) {
-        blog($1, "Symantec Found!");
+        blog($bid, "Symantec Found!");
     }               
     if ('SAFE-Agent.sys' in @matches) {
-        blog($1, "SAFE-Cyberdefense Found!");
+        blog($bid, "SAFE-Cyberdefense Found!");
     }
     if ('CybKernelTracker.sys' in @matches) {
-        blog($1, "CyberArk Software Found!");
+        blog($bid, "CyberArk Software Found!");
     }
     if ('klifks.sys' in @matches || 'klifaa.sys' in @matches || 'Klifsm.sys' in @matches) {
-        blog($1, "Kaspersky Found!");
+        blog($bid, "Kaspersky Found!");
     }
     if ('SAVOnAccess.sys' in @matches || 'savonaccess.sys' in @matches || 'sld.sys' in @matches) {
-        blog($1, "Sophos Found!");
+        blog($bid, "Sophos Found!");
     }
     if ('ssfmonm.sys' in @matches) {
-        blog($1, "Webroot Software, Inc. Found!");
+        blog($bid, "Webroot Software, Inc. Found!");
     }
     if ('CarbonBlackK.sys' in @matches || 'carbonblackk.sys' in @matches || "Parity.sys" in @matches || "cbk7.sys" in @matches || "cbstream.sys" in @matches) {
-        blog($1, "Carbon Black Found!");
+        blog($bid, "Carbon Black Found!");
     }
     if ('CRExecPrev.sys' in @matches) {
-        blog($1, "Cybereason Found!");
+        blog($bid, "Cybereason Found!");
     }
     if ('im.sys' in @matches || 'csagent.sys' in @matches) {
-        blog($1, "CrowdStrike Found!");
+        blog($bid, "CrowdStrike Found!");
     }
     if ('cfrmd.sys' in @matches || 'cmdccav.sys' in @matches || 'cmdguard.sys' in @matches || 'CmdMnEfs.sys' in @matches || 'MyDLPMF.sys' in @matches) {
-        blog($1, "Comodo Security Solutions Found!");
+        blog($bid, "Comodo Security Solutions Found!");
     }
     if ('PSINPROC.SYS' in @matches || 'PSINFILE.SYS' in @matches || 'amfsm.sys' in @matches || 'amm8660.sys' in @matches || 'amm6460.sys' in @matches) {
-        blog($1, "Panda Security Found!");
+        blog($bid, "Panda Security Found!");
     }
     if ('fsgk.sys' in @matches || 'fsatp.sys' in @matches || 'fshs.sys' in @matches) {
-        blog($1, "F-Secure Found!");
+        blog($bid, "F-Secure Found!");
     }
     if ('esensor.sys' in @matches) {
-        blog($1, "Endgame Found!");
+        blog($bid, "Endgame Found!");
     }
     if ('csacentr.sys' in @matches || 'csaenh.sys' in @matches || 'csareg.sys' in @matches || 'csascr.sys' in @matches || 'csaav.sys' in @matches || 'csaam.sys' in @matches) {
-        blog($1, "Cisco Found!");
+        blog($bid, "Cisco Found!");
     }
     if ('TMUMS.sys' in @matches || 'hfileflt.sys' in @matches || 'TMUMH.sys' in @matches || 'AcDriver.sys' in @matches || 'SakFile.sys' in @matches || 'SakMFile.sys' in @matches || 'fileflt.sys' in @matches || 'TmEsFlt.sys' in @matches || 'tmevtmgr.sys' in @matches || 'TmFileEncDmk.sys' in @matches) {
-        blog($1, "Trend Micro Inc Found!");
+        blog($bid, "Trend Micro Inc Found!");
     }
     if ('epregflt.sys' in @matches || 'medlpflt.sys' in @matches || 'dsfa.sys' in @matches || 'cposfw.sys' in @matches) {
-        blog($1, "Check Point Software Technologies Found!");
+        blog($bid, "Check Point Software Technologies Found!");
     }
     if ('psepfilter.sys' in @matches || 'cve.sys' in @matches) {
-        blog($1, "Absolute Found!");
+        blog($bid, "Absolute Found!");
     }
     if ('brfilter.sys' in @matches || 'BrCow_x_x_x_x.sys' in @matches) {
-        blog($1, "Bromium Found!");
+        blog($bid, "Bromium Found!");
     }
     if ('LRAgentMF.sys' in @matches) {
-        blog($1, "LogRhythm Found!");
+        blog($bid, "LogRhythm Found!");
     }
     if ('libwamf.sys' in @matches) {
-        blog($1, "OPSWAT Inc Found!");
+        blog($bid, "OPSWAT Inc Found!");
     }
+}
+
+popup beacon_bottom {
+	item "EDR Query" {
+		query($1);
+	}
 }
