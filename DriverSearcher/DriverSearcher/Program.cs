@@ -91,7 +91,7 @@ namespace DriverSearcher
                     case "crexecprev.sys":
                         matches.Add(filename, "Cybereason Found!");
                         break;
-                    case "im.sys": case "csagent.sys":
+                    case "im.sys": case "csagent.sys": case "CSBoot.sys": case "CSDeviceControl.sys": case "cspcm2.sys":
                         matches.Add(filename, "CrowdStrike Found!");
                         break;
                     case "cfrmd.sys": case "cmdccav.sys": case "cmdguard.sys": case "cmdmnefs.sys": case "mydlpmf.sys":
