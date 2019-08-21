@@ -153,7 +153,7 @@ sub list {
     if ('CRExecPrev.sys' in @matches) {
         blog($bid, "Cybereason Found!");
     }
-    if ('im.sys' in @matches || 'csagent.sys' in @matches) {
+    if ('im.sys' in @matches || 'CSAgent.sys' in @matches || 'CSBoot.sys' in @matches || 'CSDeviceControl.sys' in @matches || 'cspcm2.sys' in @matches) {
         blog($bid, "CrowdStrike Found!");
     }
     if ('cfrmd.sys' in @matches || 'cmdccav.sys' in @matches || 'cmdguard.sys' in @matches || 'CmdMnEfs.sys' in @matches || 'MyDLPMF.sys' in @matches) {
