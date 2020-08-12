@@ -6,125 +6,82 @@
 mkdir("/opt/cobaltstrike/Staged_Payloads");
 mkdir("/opt/cobaltstrike/Stageless_Payloads");
 
-menubar("Payload Generator", "payloadgenerator", 2);
+menubar("Payload Generator", "payloadgenerator");
 popup payloadgenerator {
 	item "&Automatic Artifact Payload Generator" {
 		prompt_confirm("Do you want to generate all the different types of Artifacts?", "Payload Generator Confirmation", {
-			show_message("Generating Artifacts...");
-			payloadgenerate();
+				show_message("Generating Artifacts...");
+				payloadgenerate();
+				show_message("Check /opt/cobaltstrike/ for Staged and Stageless Payloads");
 		});
 	}
 }
 
 sub payloadgenerate {
 	foreach $name (listeners_local()) {
-	$original_listener = $name;
-        $listener_name = lc($name);
+		$original_listener = $name;
+    	$listener_name = lc($name);
         if ($listener_name hasmatch "http" || $listener_name hasmatch "https") {
         	
         	#Staged Payloads
-        	$data = artifact($original_listener, "dll");
-        	$data1 = artifact($original_listener, "dllx64");
-        	$data2 = artifact($original_listener, "exe");
-        	$data3 = artifact($original_listener, "powershell");
-        	$data4 = artifact($original_listener, "python");
-        	$data5 = artifact($original_listener, "svcexe");
-        	$data6 = artifact($original_listener, "vbscript");
+        	$data = artifact_stager($original_listener, "dll");
+        	$data2 = artifact_stager($original_listener, "exe");
+        	$data3 = artifact_stager($original_listener, "powershell");
+        	$data4 = artifact_stager($original_listener, "python");
+        	$data5 = artifact_stager($original_listener, "svcexe");
+        	$data6 = artifact_stager($original_listener, "vbscript");
+        	$data7 = artifact_stager($original_listener, "raw");
 
-        	#Write and Save Payloads
-        	$handle = openf(">/opt/cobaltstrike/Staged_Payloads/dllpayload.dll");
-		writeb($handle, $data);
-		closef($handle);
-		$handle1 = openf(">/opt/cobaltstrike/Staged_Payloads/dllx64payload.dll");
-		writeb($handle1, $data1);
-		closef($handle1);
-		$handle2 = openf(">/opt/cobaltstrike/Staged_Payloads/exepayload.exe");
-		writeb($handle2, $data2);
-		closef($handle2);
-		$handle3 = openf(">/opt/cobaltstrike/Staged_Payloads/powershellpayload.ps1");
-		writeb($handle3, $data3);
-		closef($handle3);
-		$handle4 = openf(">/opt/cobaltstrike/Staged_Payloads/pythonpayload.py");
-		writeb($handle4, $data4);
-		closef($handle4);
-		$handle5 = openf(">/opt/cobaltstrike/Staged_Payloads/svcexepayload.exe");
-		writeb($handle5, $data5);
-		closef($handle5);
-		$handle6 = openf(">/opt/cobaltstrike/Staged_Payloads/vbspayload.vbs");
-		writeb($handle6, $data6);
-		closef($handle6);
+	        #Write and Save Payloads
+	        $handle = openf(">/opt/cobaltstrike/Staged_Payloads/dllpayload.dll");
+			writeb($handle, $data);
+			closef($handle);
+			$handle2 = openf(">/opt/cobaltstrike/Staged_Payloads/exepayload.exe");
+			writeb($handle2, $data2);
+			closef($handle2);
+			$handle3 = openf(">/opt/cobaltstrike/Staged_Payloads/powershellpayload.ps1");
+			writeb($handle3, $data3);
+			closef($handle3);
+			$handle4 = openf(">/opt/cobaltstrike/Staged_Payloads/pythonpayload.py");
+			writeb($handle4, $data4);
+			closef($handle4);
+			$handle5 = openf(">/opt/cobaltstrike/Staged_Payloads/svcexepayload.exe");
+			writeb($handle5, $data5);
+			closef($handle5);
+			$handle6 = openf(">/opt/cobaltstrike/Staged_Payloads/vbspayload.vbs");
+			writeb($handle6, $data6);
+			closef($handle6);
+			$handle7 = openf(">/opt/cobaltstrike/Staged_Payloads/rawpayload.bin");
+			writeb($handle7, $data7);
+			closef($handle7);
 
-		#Stageless Payloads
-		artifact_stageless($original_listener, "dll", "x86", "", &dll);
-        	artifact_stageless($original_listener, "dllx64", "x86", "", &dllx64);
-        	artifact_stageless($original_listener, "exe", "x86", "", &exe);
-        	artifact_stageless($original_listener, "powershell", "x86", "", &ps1);
-        	artifact_stageless($original_listener, "raw", "x86", "", &raw);
-        	artifact_stageless($original_listener, "svcexe", "x86", "", &svcexe);
-        
+			#Stageless Payloads
+			$data8 = artifact_payload($original_listener, "dll", "x64");
+	        $data9 = artifact_payload($original_listener, "exe", "x86");
+	        $data10 = artifact_payload($original_listener, "python", "x86");
+	        $data11 = artifact_payload($original_listener, "powershell", "x86");
+	        $data12 = artifact_payload($original_listener, "raw", "x86");
+	        $data13 = artifact_payload($original_listener, "svcexe", "x86");
+	        
+	        #Write and Save Payloads
+			$cradle = openf(">/opt/cobaltstrike/Stageless_Payloads/dllpayload.dll");
+			writeb($cradle, $data8);
+			closef($cradle);
+			$cradle2 = openf(">/opt/cobaltstrike/Stageless_Payloads/exepayload.exe");
+			writeb($cradle2, $data9);
+			closef($cradle2);
+			$cradle3 = openf(">/opt/cobaltstrike/Stageless_Payloads/powershellpayload.ps1");
+			writeb($cradle3, $data11);
+			closef($cradle3);
+			$cradle4 = openf(">/opt/cobaltstrike/Stageless_Payloads/rawpayload.bin");
+			writeb($cradle4, $data12);
+			closef($cradle4);
+			$cradle5 = openf(">/opt/cobaltstrike/Stageless_Payloads/pythonpayload.py");
+			writeb($cradle5, $data10);
+			closef($cradle5);
+			$cradle6 = openf(">/opt/cobaltstrike/Stageless_Payloads/svcexepayload.exe");
+			writeb($cradle6, $data13);
+			closef($cradle6);
 		}
-	}			
-}
-
-sub dll {
-
-	#Write and Save Payload
-	local('$cradle');
-	$cradle = openf(">/opt/cobaltstrike/Stageless_Payloads/dllpayload.dll");
-	writeb($cradle, $1);
-	closef($cradle);
-
-}
-
-sub dllx64 {
-
-	#Write and Save Payload
-	local('$cradle1');
-	$cradle1 = openf(">/opt/cobaltstrike/Stageless_Payloads/dllx64payload.dll");
-	writeb($cradle1, $1);
-	closef($cradle1);
-
-}
-
-sub exe {
-
-	#Write and Save Payload
-	local('$cradle2');
-	$cradle2 = openf(">/opt/cobaltstrike/Stageless_Payloads/exepayload.exe");
-	writeb($cradle2, $1);
-	closef($cradle2);
-
-}
-
-sub ps1 {
-
-	#Write and Save Payload
-	local('$cradle3');
-	$cradle3 = openf(">/opt/cobaltstrike/Stageless_Payloads/powershellpayload.ps1");
-	writeb($cradle3, $1);
-	closef($cradle3);
-
-}
-
-sub raw {
-
-	#Write and Save Payload
-	local('$cradle4');
-	$cradle4 = openf(">/opt/cobaltstrike/Stageless_Payloads/rawpayload.bin");
-	writeb($cradle4, $1);
-	closef($cradle4);
-
-}
-
-sub svcexe {
-
-	#Write and Save Payload
-	local('$cradle5');
-	$cradle5 = openf(">/opt/cobaltstrike/Stageless_Payloads/svcexepayload.exe");
-	writeb($cradle5, $1);
-	closef($cradle5);
-	if (-exists "/opt/cobaltstrike/Stageless_Payloads/svcexepayload.exe") {
-		show_message("All Staged and Stageless Payloads have been generated and saved.");
-		show_message("Check /opt/cobaltstrike/Staged_Payloads/ and /opt/cobaltstrike/Stageless_Payloads/ for Artifacts.");
 	}
 }
