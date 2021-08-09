@@ -43,3 +43,4 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     
     ![process](https://user-images.githubusercontent.com/27856212/33582815-575d368e-d914-11e7-8d48-fd4c915af5d6.png)
     
+[![Maintainability](https://cloud.quality-gate.com/dashboard/api/badge?projectName=ACP-HARAGGERY&branchName=master)](https://cloud.quality-gate.com/dashboard/branches/567158#overview)    
