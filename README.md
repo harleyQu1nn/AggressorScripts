@@ -27,6 +27,10 @@ Collection of Aggressor scripts for Cobalt Strike 3.0+ pulled from multiple sour
     
     ![certutil2](https://user-images.githubusercontent.com/27856212/29992549-12d45854-8f6c-11e7-95c7-c2892582f56f.PNG)
     
+* EDR.cna
+    
+    * Detects EDR solutions running on local/remote hosts
+    
 * RedTeamRepo.cna
 
     * A common collection of OS commands, and Red Team Tips for when you have no Google or RTFM on hand.
