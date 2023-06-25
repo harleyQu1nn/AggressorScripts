@@ -236,7 +236,7 @@ sub list {
     }
 
     ### Palo Alto
-    if ('telam.sys' in @matches {
+    if ('telam.sys' in @matches) {
         blog($bid, "Palo Alto Cortex Found!");
     })
 
