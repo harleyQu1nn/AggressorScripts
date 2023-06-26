@@ -96,7 +96,7 @@ sub list {
     ## Driver checking
 
     ### Absolute
-    if ('psepfilter.sys' || 'cve.sys' || 'cbfsfilter2017.sys' in @matches) {
+    if ('psepfilter.sys' in @matches || 'cve.sys' in @matches || 'cbfsfilter2017.sys' in @matches) {
         blog($bid, "Absolute Found!");
     }
 
@@ -106,42 +106,42 @@ sub list {
     }
 
     ### Avast
-    if ('aswSP.sys' || 'naswSP.sys' in @matches) {
+    if ('aswSP.sys' in @matches || 'naswSP.sys' in @matches) {
         blog($bid, "Avast Found!");
     }
 
     ### AVG Technologies
-    if ('avgtpx86.sys' || 'avgtpx64.sys' in @matches) {
+    if ('avgtpx86.sys' in @matches || 'avgtpx64.sys' in @matches) {
         blog($bid, "AVG Technologies Found!");
     }
 
     ## BitDefender
-        if ('edrsensor.sys' || 'hbflt.sys' || 'bdsvm.sys' || 'gzflt.sys' || 'bddevflt.sys' || 'AVCKF.SYS' || 'Atc.sys' || 'AVC3.SYS' || 'TRUFOS.SYS' || 'BDSandBox.sys' in @matches) {
+        if ('edrsensor.sys' in @matches || 'hbflt.sys' in @matches || 'bdsvm.sys' in @matches || 'gzflt.sys' in @matches || 'bddevflt.sys' in @matches || 'AVCKF.SYS' in @matches || 'Atc.sys' in @matches || 'AVC3.SYS' in @matches || 'TRUFOS.SYS' in @matches || 'BDSandBox.sys' in @matches) {
         blog($bid, "BitDefender Found!");
     }
 
     ## Bromium
-    if ('brfilter.sys' || 'BrCow_x_x_x_x.sys' || 'bemk.sys' in @matches) {
+    if ('brfilter.sys' in @matches || 'BrCow_x_x_x_x.sys' in @matches || 'bemk.sys' in @matches) {
         blog($bid, "Bromium Found!");
     }
 
     ### Carbon Black
-    if ('CarbonBlackK.sys' || 'carbonblackk.sys' || "Parity.sys" || "cbk7.sys" || "cbstream.sys" || "ctifile.sys" in @matches) {
+    if ('CarbonBlackK.sys' in @matches || 'carbonblackk.sys' in @matches || "Parity.sys" in @matches || "cbk7.sys" in @matches || "cbstream.sys" in @matches || "ctifile.sys" in @matches) {
         blog($bid, "Carbon Black Found!");
     }
 
     ### Check Point Software Technologies
-    if ('epregflt.sys' || 'medlpflt.sys' || 'dsfa.sys' || 'cposfw.sys' || 'epklib.sys' in @matches) {
+    if ('epregflt.sys' in @matches || 'medlpflt.sys' in @matches || 'dsfa.sys' in @matches || 'cposfw.sys' in @matches || 'epklib.sys' in @matches) {
         blog($bid, "Check Point Software Technologies Found!");
     }
 
     ### Cisco AMP
-    if ('CiscoAMPCEFWDriver.sys' || 'CiscoAMPHeurDriver.sys' in @matches) {
+    if ('CiscoAMPCEFWDriver.sys' in @matches || 'CiscoAMPHeurDriver.sys' in @matches) {
         blog($bid, "Cisco AMP Found!")
     }
 
     ### Cisco Secure Endpoint
-    if ('csacentr.sys' || 'csaenh.sys' || 'csareg.sys' || 'csascr.sys' || 'csaav.sys' || 'csaam.sys' in @matches) {
+    if ('csacentr.sys' in @matches || 'csaenh.sys' in @matches || 'csareg.sys' in @matches || 'csascr.sys' in @matches || 'csaav.sys' in @matches || 'csaam.sys' in @matches) {
         blog($bid, "Cisco Found!");
     }
 
@@ -151,17 +151,17 @@ sub list {
     }
 
     ### Comodo Security Solutions
-    if ('cfrmd.sys' || 'cmdccav.sys' || 'cmdguard.sys' || 'CmdMnEfs.sys' || 'MyDLPMF.sys' in @matches) {
+    if ('cfrmd.sys' in @matches || 'cmdccav.sys' in @matches || 'cmdguard.sys' in @matches || 'CmdMnEfs.sys' in @matches || 'MyDLPMF.sys' in @matches) {
         blog($bid, "Comodo Security Solutions Found!");
     }
 
     ### CrowdStrike
-    if ('im.sys' || 'CSAgent.sys' || 'CSBoot.sys' || 'CSDeviceControl.sys' || 'cspcm2.sys' in @matches) {
+    if ('im.sys' in @matches || 'CSAgent.sys' in @matches || 'CSBoot.sys' in @matches || 'CSDeviceControl.sys' in @matches || 'cspcm2.sys' in @matches) {
         blog($bid, "CrowdStrike Found!");
     }
 
     ### CyberArk 
-    if ('CybKernelTracker.sys' || 'vfdrv.sys' || 'vfnet.sys' || 'vfpd.sys' in @matches ) {
+    if ('CybKernelTracker.sys' in @matches || 'vfdrv.sys' in @matches || 'vfnet.sys' in @matches || 'vfpd.sys' in @matches ) {
         blog($bid, "CyberArk Software Found!");
     }
 
@@ -171,17 +171,17 @@ sub list {
     }
 
     ### Cylance Inc.
-    if ('CyOptics.sys' || 'CyProtectDrv32.sys' || 'CyProtectDrv64.sys' in @matches) {
+    if ('CyOptics.sys' in @matches || 'CyProtectDrv32.sys' in @matches || 'CyProtectDrv64.sys' in @matches) {
         blog($bid, "Cylance Inc. Found!");
     }
 
     ### Dell Secureworks
-    if ('groundling32.sys' || 'groundling64.sys' in @matches) {
+    if ('groundling32.sys' in @matches || 'groundling64.sys' in @matches) {
         blog($bid, "Dell Secureworks Found!");
     }
 
     ### Elastic Security for Endpoint
-    if ('ElasticEndpoint.sys' || 'ElasticEndpointDriver.sys' in @matches) {
+    if ('ElasticEndpoint.sys' in @matches || 'ElasticEndpointDriver.sys' in @matches) {
         blog($bid, "Elastic Security for Endpoint detected!")
     }
 
@@ -191,17 +191,17 @@ sub list {
     }
 
     ### ESET
-    if ('edevmon.sys' || 'ehdrv.sys' || 'eamonm.sys' || 'ekbdflt.sys' in @matches) {
+    if ('edevmon.sys' in @matches || 'ehdrv.sys' in @matches || 'eamonm.sys' in @matches || 'ekbdflt.sys' in @matches) {
         blog($bid, "ESET Found!");
     }
 
     ### FireEye
-    if ('FeKern.sys' || 'WFP_MRT.sys' in @matches) {
+    if ('FeKern.sys' in @matches || 'WFP_MRT.sys' in @matches) {
         blog($bid, "FireEye Found!");
     }
 
     ### F-Secure
-    if ('xfsgk.sys' || 'fsgk.sys' || 'fsatp.sys' || 'fshs.sys' in @matches) {
+    if ('xfsgk.sys' in @matches || 'fsgk.sys' in @matches || 'fsatp.sys' in @matches || 'fshs.sys' in @matches) {
         blog($bid, "F-Secure Found!");
     }
 
@@ -211,7 +211,7 @@ sub list {
     }
 
     ### Kaspersky
-    if ('klifks.sys' || 'klifaa.sys' || 'Klifsm.sys' in @matches) {
+    if ('klifks.sys' in @matches || 'klifaa.sys' in @matches || 'Klifsm.sys' in @matches) {
         blog($bid, "Kaspersky Found!");
     }
 
@@ -226,7 +226,7 @@ sub list {
     }
 
     ### McAfee
-    if ('mfeaskm.sys' || 'mfencfilter.sys' || 'epdrv.sys' || 'mfencoas.sys' || 'mfehidk.sys' || 'swin.sys' || 'hdlpflt.sys' || 'mfprom.sys'  || 'MfeEEFF.sys' in @matches) {
+    if ('mfeaskm.sys' in @matches || 'mfencfilter.sys' in @matches || 'epdrv.sys' in @matches || 'mfencoas.sys' in @matches || 'mfehidk.sys' in @matches || 'swin.sys' in @matches || 'hdlpflt.sys' in @matches || 'mfprom.sys' in @matches || 'MfeEEFF.sys' in @matches) {
         blog($bid, "McAfee Found!");
     }
 
@@ -238,10 +238,10 @@ sub list {
     ### Palo Alto
     if ('telam.sys' in @matches) {
         blog($bid, "Palo Alto Cortex Found!");
-    })
+    }
 
     ### Panda Security
-    if ('PSINPROC.SYS' || 'PSINFILE.SYS' || 'amfsm.sys' || 'amm8660.sys' || 'amm6460.sys' in @matches) {
+    if ('PSINPROC.SYS' in @matches || 'PSINFILE.SYS' in @matches || 'amfsm.sys' in @matches || 'amm8660.sys' in @matches || 'amm6460.sys' in @matches) {
         blog($bid, "Panda Security Found!");
     }     
 
@@ -261,22 +261,22 @@ sub list {
     }
 
     ### Sophos
-    if ('SAVOnAccess.sys' || 'savonaccess.sys' || 'sld.sys' || 'SophosED.sys' || 'sntp.sys' || 'swi_callout.sys' || 'hmpalert.sys' || 'sdcfilter.sys' || 'SophosBootDriver.sys' in @matches) {
+    if ('SAVOnAccess.sys' in @matches || 'savonaccess.sys' in @matches || 'sld.sys' in @matches || 'SophosED.sys' in @matches || 'sntp.sys' in @matches || 'swi_callout.sys' in @matches || 'hmpalert.sys' in @matches || 'sdcfilter.sys' in @matches || 'SophosBootDriver.sys' in @matches) {
         blog($bid, "Sophos Found!");
     }
 
     ### Symantec
-    if ('pgpwdefs.sys' || 'GEProtection.sys' || 'diflt.sys' || 'sysMon.sys' || 'ssrfsf.sys' || 'emxdrv2.sys' || 'reghook.sys' || 'spbbcdrv.sys' || 'bhdrvx86.sys' || 'bhdrvx64.sys' || 'SISIPSFileFilter.sys' || 'symevent.sys' || 'vxfsrep.sys' || 'VirtFile.sys' || 'SymAFR.sys' || 'symefasi.sys' || 'symefa.sys' || 'symefa64.sys' || 'SymHsm.sys' || 'evmf.sys' || 'GEFCMP.sys' || 'VFSEnc.sys' || 'pgpfs.sys' in || 'fencry.sys' || 'symrg.sys' in @matches) {
+    if ('pgpwdefs.sys' in @matches || 'GEProtection.sys' in @matches || 'diflt.sys' in @matches || 'sysMon.sys' in @matches || 'ssrfsf.sys' in @matches || 'emxdrv2.sys' in @matches || 'reghook.sys' in @matches || 'spbbcdrv.sys' in @matches || 'bhdrvx86.sys' in @matches || 'bhdrvx64.sys' in @matches || 'SISIPSFileFilter.sys' in @matches || 'symevent.sys' in @matches || 'vxfsrep.sys' in @matches || 'VirtFile.sys' in @matches || 'SymAFR.sys' in @matches || 'symefasi.sys' in @matches || 'symefa.sys' in @matches || 'symefa64.sys' in @matches || 'SymHsm.sys' in @matches || 'evmf.sys' in @matches || 'GEFCMP.sys' in @matches || 'VFSEnc.sys' in @matches || 'pgpfs.sys' in @matches || 'fencry.sys' in @matches || 'symrg.sys' in @matches) {
         blog($bid, "Symantec Found!");
     }   
 
     ### Trend Micro
-    if ('TMUMS.sys' || 'hfileflt.sys' || 'TMUMH.sys' || 'AcDriver.sys' || 'SakFile.sys' || 'SakMFile.sys' || 'fileflt.sys' || 'TmEsFlt.sys' || 'tmevtmgr.sys' || 'TmFileEncDmk.sys' in @matches) {
+    if ('TMUMS.sys' in @matches || 'hfileflt.sys' in @matches || 'TMUMH.sys' in @matches || 'AcDriver.sys' in @matches || 'SakFile.sys' in @matches || 'SakMFile.sys' in @matches || 'fileflt.sys' in @matches || 'TmEsFlt.sys' in @matches || 'tmevtmgr.sys' in @matches || 'TmFileEncDmk.sys' in @matches) {
         blog($bid, "Trend Micro Inc Found!");
     }
 
     ### Verdasys
-    if ('dgdmk.sys' || 'ndgdmk.sys' in @matches) {
+    if ('dgdmk.sys' in @matches || 'ndgdmk.sys' in @matches) {
         blog($bid, "Verdasys Inc. Found!");
     }
 
